@@ -1,12 +1,28 @@
 ﻿<Properties StartupConfiguration="{67324259-F5B9-417B-9984-354AD67E0B84}|Default">
   <MonoDevelop.Ide.Workbench>
+    <Files>
+      <File FileName="Views/Register/Index.cshtml" Line="1" Column="1" />
+      <File FileName="Views/Shared/_Layout.cshtml" Line="48" Column="78" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="mmd-plus" expanded="True">
             <Node name="mmd-plus" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
               <Node name="Properties" expanded="True" />
-              <Node name=".gitignore" selected="True" />
+              <Node name="Views" expanded="True">
+                <Node name="Home" expanded="True" />
+                <Node name="Register" expanded="True" />
+                <Node name="Shared" expanded="True">
+                  <Node name="_Layout.cshtml" selected="True" />
+                </Node>
+              </Node>
+              <Node name="wwwroot" expanded="True">
+                <Node name="css" expanded="True" />
+                <Node name="js" expanded="True" />
+              </Node>
             </Node>
           </Node>
         </State>
