@@ -1,10 +1,4 @@
-﻿using System;
-namespace mmd_plus
-{
-	public class 
-	{
-		public ()
-		{
-		}
-	}
-}
+﻿obj/
+bin/
+.vs/
+Properties
