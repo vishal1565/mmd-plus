@@ -26,5 +26,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Register\" />
+    <Folder Include="Views\Rules\" />
+    <Folder Include="Views\GetStarted\" />
+    <Folder Include="Views\ApiDoc\" />
+    <Folder Include="Views\Feedback\" />
   </ItemGroup>
 </Project>
