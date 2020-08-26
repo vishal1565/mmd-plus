@@ -28,22 +28,22 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
-                    <li class='@(ViewData["Title"] == "Home" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "Home" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
-                    <li class='@(ViewData["Title"] == "Rules" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "Rules" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="Rules" asp-action="Index">Rules</a>
                     </li>
-                    <li class='@(ViewData["Title"] == "Register" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "Register" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="Register" asp-action="Index">Register</a>
                     </li>
-                    <li class='@(ViewData["Title"] == "Get Started" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "Get Started" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="GetStarted" asp-action="Index">Get Started</a>
                     </li>
-                    <li class='@(ViewData["Title"] == "API Doc" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "API Doc" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="ApiDoc" asp-action="Index">Api Doc</a>
                     </li>
-                    <li class='@(ViewData["Title"] == "Feedback" ? "nav-item active" : "nav-item")'>
+                    <li class='@(ViewData["Title"].ToString() == "Feedback" ? "nav-item active" : "nav-item")'>
                         <a class="nav-link" asp-area="" asp-controller="Feedback" asp-action="Index">Feedback</a>
                     </li>
                 </ul>
