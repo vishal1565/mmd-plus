@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DataAccess.Model
@@ -12,6 +13,9 @@ namespace DataAccess.Model
         public long Id { get; set; }
         public string TeamId { get; set; }
         public string SecretToken { get; set; }
+        public string Location { get; set; }
+        public DateTime RegisteredAt { get; set; }
+        public DateTime LastUpdatedAt { get; set; }
         public ICollection<User> Users { get; set; }
     }
 }

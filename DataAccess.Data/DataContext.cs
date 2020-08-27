@@ -30,6 +30,8 @@ namespace DataAccess.Data
             {
                 entity.HasKey(user => user.UserId);
 
+                entity.Property(user => user.AddedAt).HasColumnType("timestamp with time zone");
+
                 entity.Property(user => user.UserId)
                 .HasMaxLength(60)
                 .IsRequired();
@@ -48,6 +50,10 @@ namespace DataAccess.Data
                 .IsRequired();
 
                 entity.HasKey(team => team.TeamId);
+
+                entity.Property(team => team.RegisteredAt).HasColumnType("timestamp with time zone");
+
+                entity.Property(team => team.LastUpdatedAt).HasColumnType("timestamp with time zone");
 
                 entity.Property(team => team.SecretToken).IsRequired();
             });

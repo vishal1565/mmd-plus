@@ -38,8 +38,8 @@ namespace mmd_plus
 
             services.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlServer(connectionString);
-            }) ;
+                options.UseNpgsql(connectionString);
+            });
 
             services.AddMvc(options => 
             {

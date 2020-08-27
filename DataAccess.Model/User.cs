@@ -9,6 +9,7 @@ namespace DataAccess.Model
         public long Id { get; set; }
         public string TeamId { get; set; }
         public string UserId { get; set; }
+        public DateTime AddedAt { get; set; }
         public Team Team { get; set; }
     }
 }
