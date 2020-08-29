@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
 using DataAccess.Model.SharedModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using mmd_plus.Models;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,7 +24,15 @@ namespace mmd_plus.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
-            return View();
+            var locations = new List<string> { "Location", "DB-Pune", "DB-Bangalore" };
+            ViewData["Location"] = new SelectList(locations, "Location");
+            var model = new RegisterViewModel
+            {
+                TeamId = "",
+                TeamMembers = new List<TeamMember> { new TeamMember { EmailId = "" } },
+                Location = ""
+            };
+            return View(model);
         }
 
         [HttpPost]
