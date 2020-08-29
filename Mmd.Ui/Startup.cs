@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataAccess.Data;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Repositories;
+using DataAccess.Data.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,9 +37,13 @@ namespace mmd_plus
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddSingleton(typeof(IEntityBaseRepository<>), typeof(EntityBaseRepository<>));
+            services.AddLogging();
 
-            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddScoped(typeof(IEntityBaseRepository<>), typeof(EntityBaseRepository<>));
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 
@@ -51,7 +56,6 @@ namespace mmd_plus
             {
                 options.EnableEndpointRouting = false;
             });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,144 @@
-﻿@{
+﻿@model RegisterViewModel
+
+@{
     ViewData["Title"] = "Register";
 }
 
-<h1>Register</h1>
+
+<div class="container">
+    <h3>Register</h3>
+    <div class="row">
+        <div class="col-sm">
+            <form asp-action="Index">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="TeamId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">TeamId</label>
+                    <input type="text" class="form-control mb-3 w-75" asp-for="TeamId" />
+                    <span asp-validation-for="TeamId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Location" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">Location</label>
+                    <select asp-for="Location" class="form-control mb-3 w-75" asp-items="ViewBag.Location"></select>
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+            <div id="teamMembers">
+                @for (var i = 0; i < Model.TeamMembers.Count; i++)
+                {
+                    var currentLabel = $"TeamMember {i + 1}";
+                    var buttonId = $"btnDelField{i}";
+                    var divId = $"teamMemberDiv{i}";
+                    <div class="row align-items-end" id="@divId">
+                        <div class="form-group col-sm-7">
+                            <label asp-for="TeamMembers[i].EmailId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">@currentLabel</label>
+                            <input type="text" class="form-control mb-3" asp-for="TeamMembers[i].EmailId" />
+                            <span asp-validation-for="TeamMembers[i].EmailId" class="text-danger"></span>
+                        </div>
+                        <div id="delBtnDiv0">
+                            @if (Model.TeamMembers.Count > 1)
+                            {
+                                <div class="col-sm-2">
+                                    <button id="@buttonId" type="button" class="btn btn-danger">Delete</button>
+                                </div>
+                            }
+                        </div>
+                            @if (i == 0 && Model.TeamMembers.Count < 5)
+                            {
+                                <div class="col-sm-2">
+                                    <button id="btnAddField" type="button" class="btn btn-success">Add</button>
+                                </div>
+                            }
+                    </div>
+                }
+            </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Register" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+        <div class="col-sm">
+            One of two columns
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+
+    GetIndex = (context) => {
+        var id = $(context).attr("id");
+        var index = id[id.length - 1]
+        return index
+    }
+
+    $(document).ready(function () {
+        var teamMembers = [""];
+
+        $('#teamMembers').on("click", '#btnAddField', function (e) {
+            e.preventDefault();
+            var $fields = $('#teamMembers');
+            var n = teamMembers.length
+            var newTeamMemberField = `\
+                    <div class="row align-items-end" id="teamMemberDiv${n}">\
+                        <div class="form-group col-sm-7">\
+                            <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n+1}</label>\
+                            <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = ""/>\
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
+                        </div>\
+                        <div id="delBtnDiv${n}">\
+                            <div class="col-sm-2">\
+                                <button id="btnDelField${n}" type = "button" class="btn btn-danger"> Delete</button>\
+                            </div>\
+                        </div >\
+                    </div>`
+            teamMembers.push("");
+            $(newTeamMemberField).appendTo($fields);
+        });
+
+        $('#teamMembers').on("click", 'button[id*="btnDelField"]', function (e) {
+            e.preventDefault();
+            var index = GetIndex(this)
+            teamMembers.splice(index, 1)
+            var totalElements = teamMembers.length
+            console.log(totalElements)
+            $('#teamMembers').empty();
+            for (var n = 0; n < teamMembers.length; n++) {
+                var $fields = $('#teamMembers');
+                var newTeamMemberField = `\
+                    <div class="row align-items-end" id="teamMemberDiv${n}">\
+                        <div class="form-group col-sm-7">\
+                            <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n + 1}</label>\
+                            <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = "${teamMembers[n]}"/>\
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
+                        </div>\ 
+                    `
+                if (teamMembers.length > 1)
+                    newTeamMemberField = newTeamMemberField +
+                        `<div id="delBtnDiv${n}">\
+                            <div class="col-sm-2">\
+                                <button id="btnDelField${n}" type = "button" class="btn btn-danger"> Delete</button>\
+                            </div>\
+                        </div >\
+                        `
+                if (n == 0)
+                    newTeamMemberField = newTeamMemberField + 
+                        `<div class="col-sm-2">\
+                            <button id="btnAddField" type="button" class="btn btn-success">Add</button>\
+                        </div>\
+                        `
+                newTeamMemberField += `</div>`
+                $(newTeamMemberField).appendTo($fields);
+            }
+        })
+
+        $('#teamMembers').on("input", 'input[name*="TeamMembers"]', function (e) {
+            e.preventDefault();
+            var index = GetIndex(this)
+            teamMembers[index] = $(this).val()
+        });
+    });
+
+</script>
+}
