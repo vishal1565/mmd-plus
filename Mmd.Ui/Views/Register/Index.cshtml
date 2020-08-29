@@ -27,7 +27,7 @@
                 {
                     var currentLabel = $"TeamMember {i + 1}";
                     var buttonId = $"btnDelField{i}";
-                    var divId = $"teamMember{i}";
+                    var divId = $"teamMemberDiv{i}";
                     <div class="row align-items-end" id="@divId">
                         <div class="form-group col-sm-7">
                             <label asp-for="TeamMembers[i].EmailId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">@currentLabel</label>
@@ -76,12 +76,12 @@
     $(document).ready(function () {
         var teamMembers = [""];
 
-        $('#btnAddField').click(function (e) {
+        $('#teamMembers').on("click", '#btnAddField', function (e) {
             e.preventDefault();
             var $fields = $('#teamMembers');
             var n = teamMembers.length
             var newTeamMemberField = `\
-                    <div class="row align-items-end">\
+                    <div class="row align-items-end" id="teamMemberDiv${n}">\
                         <div class="form-group col-sm-7">\
                             <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n+1}</label>\
                             <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = ""/>\
@@ -100,7 +100,37 @@
         $('#teamMembers').on("click", 'button[id*="btnDelField"]', function (e) {
             e.preventDefault();
             var index = GetIndex(this)
-            console.log('Delete field number' + (index))
+            teamMembers.splice(index, 1)
+            var totalElements = teamMembers.length
+            console.log(totalElements)
+            $('#teamMembers').empty();
+            for (var n = 0; n < teamMembers.length; n++) {
+                var $fields = $('#teamMembers');
+                var newTeamMemberField = `\
+                    <div class="row align-items-end" id="teamMemberDiv${n}">\
+                        <div class="form-group col-sm-7">\
+                            <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n + 1}</label>\
+                            <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = "${teamMembers[n]}"/>\
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
+                        </div>\ 
+                    `
+                if (teamMembers.length > 1)
+                    newTeamMemberField = newTeamMemberField +
+                        `<div id="delBtnDiv${n}">\
+                            <div class="col-sm-2">\
+                                <button id="btnDelField${n}" type = "button" class="btn btn-danger"> Delete</button>\
+                            </div>\
+                        </div >\
+                        `
+                if (n == 0)
+                    newTeamMemberField = newTeamMemberField + 
+                        `<div class="col-sm-2">\
+                            <button id="btnAddField" type="button" class="btn btn-success">Add</button>\
+                        </div>\
+                        `
+                newTeamMemberField += `</div>`
+                $(newTeamMemberField).appendTo($fields);
+            }
         })
 
         $('#teamMembers').on("input", 'input[name*="TeamMembers"]', function (e) {
