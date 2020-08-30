@@ -36,6 +36,8 @@ namespace DataAccess.Data
                 entity.HasKey(loc => loc.LocationId);
 
                 entity.Property(loc => loc.DisplayName).IsRequired();
+
+                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<Team>(entity =>
@@ -56,6 +58,8 @@ namespace DataAccess.Data
                       .WithOne(loc => loc.Team)
                       .HasForeignKey<Team>(team => team.Location)
                       .HasConstraintName("FK_Team_Loc");
+
+                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<User>(entity => 
@@ -63,6 +67,8 @@ namespace DataAccess.Data
                 entity.HasKey(user => user.UserId);
 
                 entity.Property(user => user.AddedAt).HasColumnType("timestamp with time zone");
+
+                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
 
                 entity.Property(user => user.UserId)
                 .HasMaxLength(60)

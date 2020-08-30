@@ -114,11 +114,16 @@ namespace DataAccess.Data.Services
 
                 if (alreadyRegisteredTeam == null)
                 {
+                    var locationId = _context.Locations.Where(loc => loc.DisplayName == validRegisterTeam.Location).SingleOrDefault();
+
+                    if (locationId == null)
+                        throw new Exception("Invalid location provided in request form");
+
                     // Register New Team
                     var newTeam = new Team
                     {
                         TeamId = validRegisterTeam.TeamId,
-                        Location = validRegisterTeam.Location,
+                        Location = locationId.LocationId,
                         RegisteredAt = validRegisterTeam.RequestTime,
                         LastUpdatedAt = validRegisterTeam.RequestTime,
                         SecretToken = Guid.NewGuid().ToString("N"),
