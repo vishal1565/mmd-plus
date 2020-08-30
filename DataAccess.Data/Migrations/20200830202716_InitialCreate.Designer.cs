@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200827181654_AutoIncrementedId")]
-    partial class AutoIncrementedId
+    [Migration("20200830202716_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,6 +21,24 @@ namespace DataAccess.Data.Migrations
                 .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            modelBuilder.Entity("DataAccess.Model.Location", b =>
+                {
+                    b.Property<string>("LocationId")
+                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("LocationId");
+
+                    b.ToTable("Locations");
+                });
+
             modelBuilder.Entity("DataAccess.Model.Team", b =>
                 {
                     b.Property<string>("TeamId")
@@ -28,15 +46,13 @@ namespace DataAccess.Data.Migrations
                         .HasMaxLength(20);
 
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Location")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("timestamp with time zone");
@@ -46,6 +62,9 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("TeamId");
+
+                    b.HasIndex("Location")
+                        .IsUnique();
 
                     b.ToTable("Teams");
                 });
@@ -60,9 +79,7 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TeamId")
                         .IsRequired()
@@ -74,6 +91,15 @@ namespace DataAccess.Data.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DataAccess.Model.Team", b =>
+                {
+                    b.HasOne("DataAccess.Model.Location", "LocationNav")
+                        .WithOne("Team")
+                        .HasForeignKey("DataAccess.Model.Team", "Location")
+                        .HasConstraintName("FK_Team_Loc")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("DataAccess.Model.User", b =>

@@ -2,10 +2,12 @@
 using DataAccess.Data.Repositories;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataAccess.Data.Services
@@ -23,6 +25,83 @@ namespace DataAccess.Data.Services
             _teamBaseRepo = teamBaseRepo;
             _userBaseRepo = userBaseRepo;
             _logger = logger;
+        }
+
+        public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
+        {
+            IQueryable<Team> query = null;
+
+            totalCount = _teamBaseRepo.Count();
+
+            query = _context.Teams.Include(team => team.LocationNav);
+
+            query = GetQuery(query, sortColumn, sortDir);
+
+            foreach(var x in searchValues)
+            {
+                query = AddSearchParameter(query, x.Key, x.Value.ToLowerInvariant());
+            }
+
+            filteredCount = query.Count();
+
+            query = query.Skip(start).Take(length);
+
+            var result = query.ToList();
+
+            var listOfRegisteredTeams = new List<RegisteredTeam>();
+
+            foreach (var team in result)
+                listOfRegisteredTeams.Add(GetTeamDisplayModel(team));
+
+            return listOfRegisteredTeams;
+        }
+
+        private RegisteredTeam GetTeamDisplayModel(Team item)
+        {
+            return new RegisteredTeam
+            {
+                TeamId = item.TeamId,
+                Location = item.LocationNav.DisplayName,
+                RegistrationTime = item.RegisteredAt
+            };
+        }
+
+        private IQueryable<Team> AddSearchParameter(IQueryable<Team> query, string key, string value)
+        {
+            IQueryable<Team> _query = query;
+            switch(key)
+            {
+                case "id": return query.Where(t => t.Id.ToString().Contains(value));
+                case "teamId": return query.Where(t => t.TeamId.ToLowerInvariant().Contains(value));
+                case "location": return query.Where(t => t.Location.ToLowerInvariant().Contains(value));
+                case "registrationTime": return query.Where(t => t.RegisteredAt.ToString().Contains(value));
+            }
+            return _query;
+        }
+
+        private IQueryable<Team> GetQuery(IQueryable<Team> query, string sortColumn, string sortDir)
+        {
+            if(sortDir == "asc")
+            {
+                switch (sortColumn)
+                {
+                    case "id": return query.OrderBy(t => t.Id);
+                    case "teamId": return query.OrderBy(t => t.TeamId);
+                    case "location": return query.OrderBy(t => t.Location);
+                    case "registrationTime": return query.OrderBy(t => t.RegisteredAt);
+                }
+            }
+            else
+            {
+                switch (sortColumn)
+                {
+                    case "id": return query.OrderByDescending(t => t.Id);
+                    case "teamId": return query.OrderByDescending(t => t.TeamId);
+                    case "location": return query.OrderByDescending(t => t.Location);
+                    case "registrationTime": return query.OrderByDescending(t => t.RegisteredAt);
+                }
+            }
+            return query;
         }
 
         public string RegisterOrUpdate(RegisterTeam validRegisterTeam)
@@ -85,6 +164,11 @@ namespace DataAccess.Data.Services
                 _logger.LogError($"{ex}");
                 return null;
             }
+        }
+
+        public List<string> GetLocations()
+        {
+            return _context.Locations.Select(loc => loc.DisplayName).ToList();
         }
     }
 }

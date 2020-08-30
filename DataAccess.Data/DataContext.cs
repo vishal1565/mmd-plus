@@ -9,6 +9,7 @@ namespace DataAccess.Data
 {
     public class DataContext : DbContext
     {
+        public DbSet<Location> Locations { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -26,21 +27,15 @@ namespace DataAccess.Data
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(entity => 
+            modelBuilder.Entity<Location>(entity =>
             {
-                entity.HasKey(user => user.UserId);
-
-                entity.Property(user => user.AddedAt).HasColumnType("timestamp with time zone");
-
-                entity.Property(user => user.UserId)
-                .HasMaxLength(60)
+                entity.Property(loc => loc.LocationId)
+                .HasMaxLength(20)
                 .IsRequired();
 
-                entity.Property(user => user.TeamId)
-                .HasMaxLength(60)
-                .IsRequired();
+                entity.HasKey(loc => loc.LocationId);
 
-                entity.HasOne(p => p.Team).WithMany(d => d.Users).HasConstraintName("FK_User_Team").HasForeignKey(d => d.TeamId);
+                entity.Property(loc => loc.DisplayName).IsRequired();
             });
 
             modelBuilder.Entity<Team>(entity =>
@@ -56,6 +51,28 @@ namespace DataAccess.Data
                 entity.Property(team => team.LastUpdatedAt).HasColumnType("timestamp with time zone");
 
                 entity.Property(team => team.SecretToken).IsRequired();
+
+                entity.HasOne(team => team.LocationNav)
+                      .WithOne(loc => loc.Team)
+                      .HasForeignKey<Team>(team => team.Location)
+                      .HasConstraintName("FK_Team_Loc");
+            });
+
+            modelBuilder.Entity<User>(entity => 
+            {
+                entity.HasKey(user => user.UserId);
+
+                entity.Property(user => user.AddedAt).HasColumnType("timestamp with time zone");
+
+                entity.Property(user => user.UserId)
+                .HasMaxLength(60)
+                .IsRequired();
+
+                entity.Property(user => user.TeamId)
+                .HasMaxLength(60)
+                .IsRequired();
+
+                entity.HasOne(p => p.Team).WithMany(d => d.Users).HasConstraintName("FK_User_Team").HasForeignKey(d => d.TeamId);
             });
         }
     }

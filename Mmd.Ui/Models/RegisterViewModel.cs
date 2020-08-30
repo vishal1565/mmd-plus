@@ -13,7 +13,6 @@ namespace mmd_plus.Models
         public string TeamId { get; set; }
         public List<TeamMember> TeamMembers { get; set; }
         public string Location { get; set; }
-        public List<Team> RegisteredTeams { get; set; }
     }
 
     public class TeamMember

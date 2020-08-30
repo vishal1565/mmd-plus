@@ -8,6 +8,19 @@ namespace DataAccess.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Locations",
+                columns: table => new
+                {
+                    LocationId = table.Column<string>(maxLength: 20, nullable: false),
+                    Id = table.Column<long>(nullable: false),
+                    DisplayName = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Locations", x => x.LocationId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
@@ -21,6 +34,12 @@ namespace DataAccess.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teams", x => x.TeamId);
+                    table.ForeignKey(
+                        name: "FK_Team_Loc",
+                        column: x => x.Location,
+                        principalTable: "Locations",
+                        principalColumn: "LocationId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,6 +63,12 @@ namespace DataAccess.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Teams_Location",
+                table: "Teams",
+                column: "Location",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_TeamId",
                 table: "Users",
                 column: "TeamId");
@@ -56,6 +81,9 @@ namespace DataAccess.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Teams");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
         }
     }
 }
