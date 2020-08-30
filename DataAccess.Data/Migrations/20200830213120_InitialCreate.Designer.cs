@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200830202716_InitialCreate")]
+    [Migration("20200830213120_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,7 +32,9 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.HasKey("LocationId");
 
@@ -46,7 +48,9 @@ namespace DataAccess.Data.Migrations
                         .HasMaxLength(20);
 
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -63,8 +67,7 @@ namespace DataAccess.Data.Migrations
 
                     b.HasKey("TeamId");
 
-                    b.HasIndex("Location")
-                        .IsUnique();
+                    b.HasIndex("Location");
 
                     b.ToTable("Teams");
                 });
@@ -79,7 +82,9 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("TeamId")
                         .IsRequired()
@@ -96,8 +101,8 @@ namespace DataAccess.Data.Migrations
             modelBuilder.Entity("DataAccess.Model.Team", b =>
                 {
                     b.HasOne("DataAccess.Model.Location", "LocationNav")
-                        .WithOne("Team")
-                        .HasForeignKey("DataAccess.Model.Team", "Location")
+                        .WithMany("Teams")
+                        .HasForeignKey("Location")
                         .HasConstraintName("FK_Team_Loc")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

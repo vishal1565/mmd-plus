@@ -65,8 +65,7 @@ namespace DataAccess.Data.Migrations
 
                     b.HasKey("TeamId");
 
-                    b.HasIndex("Location")
-                        .IsUnique();
+                    b.HasIndex("Location");
 
                     b.ToTable("Teams");
                 });
@@ -100,8 +99,8 @@ namespace DataAccess.Data.Migrations
             modelBuilder.Entity("DataAccess.Model.Team", b =>
                 {
                     b.HasOne("DataAccess.Model.Location", "LocationNav")
-                        .WithOne("Team")
-                        .HasForeignKey("DataAccess.Model.Team", "Location")
+                        .WithMany("Teams")
+                        .HasForeignKey("Location")
                         .HasConstraintName("FK_Team_Loc")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

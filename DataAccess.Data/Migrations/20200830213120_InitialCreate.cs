@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DataAccess.Data.Migrations
 {
@@ -12,7 +13,8 @@ namespace DataAccess.Data.Migrations
                 columns: table => new
                 {
                     LocationId = table.Column<string>(maxLength: 20, nullable: false),
-                    Id = table.Column<long>(nullable: false),
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DisplayName = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -25,7 +27,8 @@ namespace DataAccess.Data.Migrations
                 columns: table => new
                 {
                     TeamId = table.Column<string>(maxLength: 20, nullable: false),
-                    Id = table.Column<long>(nullable: false),
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SecretToken = table.Column<string>(nullable: false),
                     Location = table.Column<string>(nullable: true),
                     RegisteredAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -47,7 +50,8 @@ namespace DataAccess.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(maxLength: 60, nullable: false),
-                    Id = table.Column<long>(nullable: false),
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TeamId = table.Column<string>(maxLength: 60, nullable: false),
                     AddedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -65,8 +69,7 @@ namespace DataAccess.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Teams_Location",
                 table: "Teams",
-                column: "Location",
-                unique: true);
+                column: "Location");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_TeamId",

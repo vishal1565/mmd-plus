@@ -55,8 +55,8 @@ namespace DataAccess.Data
                 entity.Property(team => team.SecretToken).IsRequired();
 
                 entity.HasOne(team => team.LocationNav)
-                      .WithOne(loc => loc.Team)
-                      .HasForeignKey<Team>(team => team.Location)
+                      .WithMany(loc => loc.Teams)
+                      .HasForeignKey(team => team.Location)
                       .HasConstraintName("FK_Team_Loc");
 
                 entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
