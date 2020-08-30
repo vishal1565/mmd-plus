@@ -72,8 +72,8 @@ namespace DataAccess.Data.Services
             switch(key)
             {
                 case "id": return query.Where(t => t.Id.ToString().Contains(value));
-                case "teamId": return query.Where(t => t.TeamId.ToLowerInvariant().Contains(value));
-                case "location": return query.Where(t => t.Location.ToLowerInvariant().Contains(value));
+                case "teamId": return query.Where(t => t.TeamId.Contains(value));
+                case "location": return query.Where(t => t.Location.Contains(value));
                 case "registrationTime": return query.Where(t => t.RegisteredAt.ToString().Contains(value));
             }
             return _query;
