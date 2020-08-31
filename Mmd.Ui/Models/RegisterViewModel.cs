@@ -1,6 +1,8 @@
 ﻿using DataAccess.Model;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,13 +14,23 @@ namespace mmd_plus.Models
         [Required(ErrorMessage = "TeamId Required")]
         public string TeamId { get; set; }
         public List<TeamMember> TeamMembers { get; set; }
+
+        [Required(ErrorMessage = "Location Required")]
         public string Location { get; set; }
+
+        public ModalMessage Message { get; set; }
     }
 
     public class TeamMember
     {
-        [Required(ErrorMessage = "Email Id Required")]
-        [EmailAddress]
+        [Required(ErrorMessage = "TeamMember EmailId Required")]
+        [EmailAddress(ErrorMessage = "Enter a Valid Email Address")]
         public string EmailId { get; set; }
+    }
+
+    public class ModalMessage
+    {
+        public string Type { get; set; }
+        public string Message { get; set; }
     }
 }

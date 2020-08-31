@@ -18,13 +18,17 @@ namespace DataAccess.Data.Services
         private readonly IEntityBaseRepository<Team> _teamBaseRepo;
         private readonly IEntityBaseRepository<User> _userBaseRepo;
         private readonly ILogger<RegistrationService> _logger;
+        private readonly ITeamRepository _teamRepo;
+        private readonly IUserRepository _userRepo;
 
-        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger)
+        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo)
         {
             _context = context;
             _teamBaseRepo = teamBaseRepo;
             _userBaseRepo = userBaseRepo;
             _logger = logger;
+            _teamRepo = teamRepo;
+            _userRepo = userRepo;
         }
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
@@ -174,6 +178,16 @@ namespace DataAccess.Data.Services
         public List<string> GetLocations()
         {
             return _context.Locations.Select(loc => loc.DisplayName).ToList();
+        }
+
+        public bool TeamIdIsUnique(string teamId)
+        {
+            return _teamRepo.isTeamIdUnique(teamId.ToLowerInvariant());
+        }
+
+        public bool EmailIdIsUnique(string emailId)
+        {
+            return _userRepo.isEmailUniq(emailId.ToLowerInvariant());
         }
     }
 }

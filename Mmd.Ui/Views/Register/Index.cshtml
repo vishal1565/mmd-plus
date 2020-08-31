@@ -37,7 +37,7 @@
                             <span asp-validation-for="TeamMembers[i].EmailId" class="text-danger"></span>
                         </div>
                         <div id="delBtnDiv_0">
-                            @if (Model.TeamMembers.Count > 1)
+                            @if (i > 0)
                             {
                                 <div class="col-sm-2">
                                     <button id="@buttonId" type="button" class="btn btn-danger">Delete</button>
@@ -73,13 +73,26 @@
     </div>
 </div>
 
+<div class="modal fade col-md-4" style="top: 80%" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@Model.Message.Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script type="text/javascript">
 
-    var teamMembers = new Array("");
+    var teamMembers = new Array()
 
-    var fieldCount = 1
+    var fieldCount = 0
 
     GetIndex = (context) => {
         // works when element id is in form string_index
@@ -137,6 +150,23 @@
 
     $(document).ready(function () {
 
+        var statesAvailable = @Html.Raw(ViewBag.CurrentIds);
+
+        $.each(statesAvailable, function (i) {
+            console.log(statesAvailable[i])
+            teamMembers.push(statesAvailable[i]);
+            fieldCount++;
+        });
+
+        if ('@Model.Message.Message'.length > 0) {
+            if ('@Model.Message.Type' === 'success')
+                $('.modal-content').css('background-color', '#339933')
+            if ('@Model.Message.Type' === 'error')
+                $('.modal-content').css('background-color', '#ff4d4d')
+
+            $('#exampleModal').modal('show')
+        }
+
         $('#teamMembers').on("click", '#btnAddField', function (e) {
             e.preventDefault();
             fieldCount++;
@@ -193,7 +223,7 @@
             "serverSide": true,
             "orderCellsTop": true,
             "fixedHeader": true,
-            "scrollY": 800,
+            "scrollY": 400,
             "scrollX": true,
             //"scrollCollapse": true,
             "fixedColumns": true,

@@ -23,17 +23,28 @@ namespace mmd_plus.Controllers
             _service = service;
         }
 
-        // GET: /<controller>/
-        public IActionResult Index()
+
+        void PopulateViewData(RegisterViewModel request)
         {
             var locations = _service.GetLocations();
             ViewData["Location"] = new SelectList(locations, "Location");
+            var list = new List<string>();
+            foreach (var tm in request.TeamMembers)
+                list.Add(tm.EmailId);
+            ViewBag.CurrentIds = JsonConvert.SerializeObject(list);
+        }
+
+        // GET: /<controller>/
+        public IActionResult Index()
+        {
             var model = new RegisterViewModel
             {
                 TeamId = "",
                 TeamMembers = new List<TeamMember> { new TeamMember { EmailId = "" } },
                 Location = "",
+                Message = new ModalMessage { Type = "", Message = "" }
             };
+            PopulateViewData(model);
             return View(model);
         }
 
@@ -75,26 +86,44 @@ namespace mmd_plus.Controllers
         {
             Validate(request);
 
+            PopulateViewData(request);
+
             if(ModelState.IsValid)
             {
                 var validRegisterTeam = PreProcess(request);
 
                 var message = _service.RegisterOrUpdate(validRegisterTeam);
 
-                if (message == null)
+                var responseModel = new RegisterViewModel
                 {
-                    // return view with error message of "Registration Failed"
-                }
+                    TeamId = "",
+                    TeamMembers = new List<TeamMember> { new TeamMember { EmailId = "" } },
+                    Location = "",
+                    Message = new ModalMessage()
+                };
+
+                if (message == null)
+                    responseModel.Message.Type = "error";
                 else
-                    return View("Index");
+                    responseModel.Message.Type = "success";
+
+                responseModel.Message.Message = message;
+                return View(responseModel);
 
             }
-            return View();
+            request.Message = new ModalMessage { Type = "", Message = "" };
+            return View(request);
         }
 
         private void Validate(RegisterViewModel request)
         {
-            //ModelState.AddModelError("TeamId", "Team Already Registered");
+            if (!_service.TeamIdIsUnique(request.TeamId))
+                ModelState.AddModelError("TeamId", "TeamId already exists");
+            for (var i = 0;i < request.TeamMembers.Count;i++)
+                if (!_service.EmailIdIsUnique(request.TeamMembers[i].EmailId))
+                    ModelState.AddModelError($"TeamMembers[{i}].EmailId", "User already registered");
+            if (request.Location == "Select")
+                ModelState.AddModelError("Location", "Specify a Location");
             return;
         }
 
@@ -103,12 +132,12 @@ namespace mmd_plus.Controllers
             var newTeamMembers = new List<string>();
 
             foreach (var tm in request.TeamMembers)
-                newTeamMembers.Add(tm.EmailId.ToLower());
+                newTeamMembers.Add(tm.EmailId.ToLowerInvariant());
 
             return new RegisterTeam
             {
-                TeamId = request.TeamId.ToLower(),
-                Location = request.Location.ToUpper(),
+                TeamId = request.TeamId.ToLowerInvariant(),
+                Location = request.Location,
                 RequestTime = DateTime.UtcNow,
                 TeamMembers = newTeamMembers
             };
