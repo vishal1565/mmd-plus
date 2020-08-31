@@ -1,5 +1,67 @@
-﻿@{
+@{
     ViewData["Title"] = "Rules";
 }
 
-<h1>Rules</h1>
+
+<div class="row">
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">
+      The original game - <a href = "https://en.wikipedia.org/wiki/Mastermind_(board_game)"> Mastermind </a></h5>
+			<p class="card-text">Excited! Yes, so we are. In summary, you need to <b>'guess'</b> a server <b>'secret'</b> (a number) and the server will respond back a <b>'hint'</b> and reward you points. The 'hint' comprises of
+				<ul>
+					<li>Exact match : No of digits matched by value and position - 10 points/digit</li>
+					<li>Partial match : No of digits matched by value but not position - 5 points/digit</li>
+				</ul> Now, based on the response you need to fire your next 'guess'. Game continues till you 'crack' the secret. </p>
+                <img src = "~/img/pointsystem.adba7372.png">
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">"Twist" for the sake of competition and game rules </h5>
+			<p class="card-text"> Sounds easy right! Let's have some 'twists'. On the final day of competition entire game will run approximately 1 hour and you need to call <a href="/ApiDoc"> REST APIs </a> to play the game.
+				<ul>
+					<li>Total <b>10 rounds</b> will be played</li>
+					<li>In each round, <b>number of digits</b> in the 'secret' will vary. Complexity will increase as rounds progress. Say, in round 10 you will be cracking 10 digit 'secret'</li>
+					<li>Participants will join in each round and server will register a <b>'secret' for each participant</b> in each round</li>
+					<li>You need to crack 'secret' of <b>other participants</b></li>
+					<li>As soon as you crack someone's 'secret', he/she will be <b>out of that round</b>. Same applies to you. <b>Cracking a secret will give you additional 1000 bonus points</b>.</li>
+					<li>Each round would take 6 minutes to complete (joining:30s + running:300s + finish:30s)</li>
+					<li>You need to join each round during the joining phase</li>
+					<li>During running phase you can fire guesses keeping minimum 5 second gap between 2 consecutive api calls</li>
+					<li>You can guess maximum 5 secrets in a single api call</li>
+					<li>All above info are available through <a href="/ApiDoc">REST APIs </a> </li>
+				</ul> Please see 'How to participate' section below for further details. </p>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">Winning Conditions </h5>
+			<p class="card-text"> On the final day, winner will be decided by the server (and a quick code review to prevent unethical hacking), <b>live leaderboard</b> will be published to witness the battle across regions. Wining conditions are
+				<ul>
+					<li>Highest points after 10 rounds</li>
+					<li>Algo must be deployed in GCP</li>
+					<li>In case of 'Tie', algo which uses minimal resource (CPU+Memory) will win</li>
+				</ul>
+			</p>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">The game server, APIs and your algo </h5>
+			<p class="card-text"> We have developed the game server and <a href="/ApiDoc"> REST APIs</a>. All are hosted on GCP. Your 'algo' will fight against each other by calling those APIs. Please see below - 'How to participate'. </p>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">How to participate </h5>
+			<p class="card-text"> Relax, it shouldn't take more that <b>5 minutes</b> to set yourself up and start playing sitting at your desk. If you have done a bit of algo earlier, you are ready to participate. We already have provided <a href="/GetStarted">boilerplate code</a> in your favourite language and detailed instruction on how to deploy on GCP. You only need to improve the 'dumb' algo in sample code. We are happy to help you, connect us in Symphony/Email. </p>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">   Improving your 'algo' </h5>
+			<p class="card-text"> We shall keep 'the game server' running so that you can improve your algo by playing with dummies or with other participants who will connect at the same time. You will be given sufficient time to improve your algo. Please follow <a href="#">detailed schedule</a>. </p>
+		</div>
+	</div>
+</div>

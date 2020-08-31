@@ -1,4 +1,4 @@
-﻿/* Sticky footer styles
+/* Sticky footer styles
 -------------------------------------------------- */
 html {
     position: relative;
@@ -36,4 +36,13 @@ body > .container {
 
 code {
     font-size: 80%;
+}
+
+/* --- Rules Page Card CSS --- */
+.card {
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px;
+    padding: 10px; 
+    margin-bottom:20px; 
+    margin-left:20px; 
+    margin-right:20px;
 }
