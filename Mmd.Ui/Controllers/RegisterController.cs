@@ -23,7 +23,7 @@ namespace mmd_plus.Controllers
             _service = service;
         }
 
-        void PopulateViewData(RegisterViewModel request)
+        void PopulateRegisterViewData(RegisterViewModel request)
         {
             var locations = _service.GetLocations();
             ViewData["Location"] = new SelectList(locations, "Location");
@@ -43,7 +43,7 @@ namespace mmd_plus.Controllers
                 Location = "",
                 Message = new ModalMessage { Type = "", Message = "" }
             };
-            PopulateViewData(model);
+            PopulateRegisterViewData(model);
             return View(model);
         }
 
@@ -85,7 +85,7 @@ namespace mmd_plus.Controllers
         {
             Validate(request);
 
-            PopulateViewData(request);
+            PopulateRegisterViewData(request);
 
             if(ModelState.IsValid)
             {
@@ -141,6 +141,74 @@ namespace mmd_plus.Controllers
                 RequestTime = DateTime.UtcNow,
                 TeamMembers = newTeamMembers
             };
+        }
+
+        public IActionResult ModifyTeam()
+        {
+            var model = new ModifyTeamViewModel
+            {
+                TeamId = "",
+                SecretToken = ""
+            };
+            PopulateModifyTeamViewBag(model, false);
+            return View(model);
+        }
+
+        public void PopulateModifyTeamViewBag(ModifyTeamViewModel request, bool validTeam)
+        {
+            ViewBag.ValidTeam = validTeam;
+            var list = new List<string>();
+            if(request.TeamMembers != null)
+            foreach (var tm in request.TeamMembers)
+                list.Add(tm.EmailId);
+            ViewBag.CurrentIds = JsonConvert.SerializeObject(list);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ModifyTeam(ModifyTeamViewModel request)
+        {
+            if (!string.IsNullOrWhiteSpace(request.TeamId))
+                request.TeamId = request.TeamId.ToLowerInvariant();
+
+            if (!string.IsNullOrWhiteSpace(request.SecretToken))
+                request.SecretToken = request.SecretToken.ToLowerInvariant();
+
+            if (!_service.DoesTeamExist(request.TeamId))
+                ModelState.AddModelError("TeamId", "Team Doesn't Exist");
+
+            else if (!_service.IsSecretTokenCorrect(request.TeamId, request.SecretToken))
+                ModelState.AddModelError("SecretToken", "Incorrect Token");
+            
+            if(ModelState.IsValid)
+            {
+                var teamMembers = new List<TeamMember>();
+                _service.GetTeamMembers(request.TeamId).ForEach(tm => teamMembers.Add(new TeamMember { EmailId = tm }));
+                request.TeamMembers = teamMembers;
+                PopulateModifyTeamViewBag(request, true);
+                return View(request);
+            }
+
+            PopulateModifyTeamViewBag(request, false);
+            return View(request);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ChangeTeamMembers(ModifyTeamViewModel request)
+        {
+            if (ModelState.IsValid)
+            {
+                ModelState.Clear();
+                var model = new ModifyTeamViewModel
+                {
+                    TeamId = "",
+                    SecretToken = ""
+                };
+                PopulateModifyTeamViewBag(model, false);
+                return View("ModifyTeam", model);
+            }
+            
+            PopulateModifyTeamViewBag(request, true);
+            return View("ModifyTeam", request);
         }
     }
 }

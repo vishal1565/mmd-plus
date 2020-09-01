@@ -1,0 +1,216 @@
+﻿@model ModifyTeamViewModel
+
+@{
+    ViewData["Title"] = "Modify Team";
+}
+
+<div class="container">
+    <h3>Register</h3>
+    <div class="row">
+        <div class="col-sm">
+            @if (ViewBag.ValidTeam == false)
+            {
+                <form asp-action="ModifyTeam" id="teamValidationForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="TeamId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">TeamId</label>
+                        <input type="text" class="form-control mb-3 w-75" asp-for="TeamId" />
+                        <span asp-validation-for="TeamId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SecretToken" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">SecretToken</label>
+                        <input type="text" class="form-control mb-3 w-75" asp-for="SecretToken" />
+                        <span asp-validation-for="SecretToken" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Modify" class="btn btn-primary" />
+                    </div>
+                </form>
+
+            }
+            else
+            {
+                <form asp-action="ChangeTeamMembers" id="memberModificationForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="TeamId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">TeamId</label>
+                        <input type="text" class="form-control mb-3 w-75" asp-for="TeamId" readonly />
+                        <span asp-validation-for="TeamId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SecretToken" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">SecretToken</label>
+                        <input type="text" class="form-control mb-3 w-75" asp-for="SecretToken" readonly />
+                        <span asp-validation-for="SecretToken" class="text-danger"></span>
+                    </div>
+                    <div id="teamMembers">
+                        @for (var i = 0; i < Model.TeamMembers.Count; i++)
+                        {
+                            var currentLabel = $"TeamMember {i + 1}";
+                            var buttonId = $"btnDelField_{i}";
+                            var divId = $"teamMemberDiv_{i}";
+                            <div class="row align-items-end" id="@divId">
+                                <div class="form-group col-sm-7">
+                                    <label asp-for="TeamMembers[i].EmailId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">@currentLabel</label>
+                                    <input type="text" class="form-control mb-3" asp-for="TeamMembers[i].EmailId" />
+                                    <span asp-validation-for="TeamMembers[i].EmailId" class="text-danger"></span>
+                                </div>
+                                <div id="delBtnDiv_0">
+                                    @if (i > 0)
+                                    {
+                                        <div class="col-sm-2">
+                                            <button id="@buttonId" type="button" class="btn btn-danger">Delete</button>
+                                        </div>
+                                    }
+                                </div>
+                                @if (i == 0 && Model.TeamMembers.Count < 5)
+                                {
+                                    <div class="col-sm-2">
+                                        <button id="btnAddField" type="button" class="btn btn-success">Add</button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <input id="modifyButton" type="submit" value="Modify Team" class="btn btn-primary" disabled/>
+                    </div>
+
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+
+    var teamMembers = new Array()
+
+    var oldMembersList = new Array()
+
+    var fieldCount = 0
+
+    GetIndex = (context) => {
+        // works when element id is in form string_index
+        var id = $(context).attr("id");
+        var c = id.split('_')[1]
+        var index = parseInt(c)
+        return index
+    }
+
+    GenerateFields = () => {
+        $('#teamMembers').empty();
+        for (var n = 0; n < teamMembers.length; n++) {
+            var $fields = $('#teamMembers');
+            var newTeamMemberField = `\
+                    <div class="row align-items-end" id="teamMemberDiv_${n}">\
+                        <div class="form-group col-sm-7">\
+                            <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n + 1}</label>\
+                            <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = "${teamMembers[n]}"/>\
+                            <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
+                        </div>\
+                    `
+            if (n > 0)
+                newTeamMemberField = newTeamMemberField +
+                    `<div id="delBtnDiv_${n}">\
+                            <div class="col-sm-2">\
+                                <button id="btnDelField_${n}" type = "button" class="btn btn-danger"> Delete</button>\
+                            </div>\
+                        </div >\
+                        `
+            if (n == 0 && fieldCount < 5)
+                newTeamMemberField = newTeamMemberField +
+                    `<div class="col-sm-2">\
+                            <button id="btnAddField" type="button" class="btn btn-success">Add</button>\
+                        </div>\
+                        `
+            newTeamMemberField += `</div>`
+
+            $(newTeamMemberField).appendTo($fields);
+        }
+    }
+
+    IsSame = (list1, list2) => {
+
+        console.log(list1)
+        console.log(list2)
+
+        if (list1 == null && list2 == null)
+            return true;
+        if (list1.length == 0 && list2.length == 0)
+            return true;
+
+        list1.map(x => {
+            if (list2.indexOf(x) == -1)
+                return false;
+        })
+
+        list2.map(x => {
+            if (list1.indexOf(x) == -1)
+                return false;
+        })
+
+        return false;
+    }
+
+    $(document).ready(function () {
+
+        var statesAvailable = @Html.Raw(ViewBag.CurrentIds);
+
+        $.each(statesAvailable, function (i) {
+            teamMembers.push(statesAvailable[i]);
+            oldMembersList.push(statesAvailable[i]);
+            fieldCount++;
+        });
+
+        var modalJson = @Html.Raw(Json.Serialize(Model.Message))
+
+        if (modalJson && Object.keys(modalJson) > 0 && typeof modalJson.message !== 'undefined' && typeof modalJson.type !== 'undefined') {
+            if (modalJson.type === 'success') {
+                $('.modal-content').css('background-color', '#339933')
+                $('#exampleModal').modal('show')
+            }
+            else if (modalJson.type === 'error') {
+                $('.modal-content').css('background-color', '#ff4d4d')
+                $('#exampleModal').modal('show')
+            }
+        }
+
+        $('#teamMembers').on("click", '#btnAddField', function (e) {
+            e.preventDefault();
+            fieldCount++;
+            teamMembers.push("");
+            GenerateFields()
+        });
+
+        $('#teamMembers').on("click", 'button[id*="btnDelField"]', function (e) {
+            e.preventDefault();
+            fieldCount--;
+            teamMembers.splice(GetIndex(this), 1)
+            GenerateFields()
+        })
+
+        $('#teamMembers').on("input", 'input[name*="TeamMembers"]', function (e) {
+            e.preventDefault();
+            if (Object.keys($(this).rules()).length == 0) {
+                $(this).rules("add", {
+                    required: true,
+                    email: true,
+                    maxlength: 60,
+                    messages: {
+                        email: 'Invalid Email Address',
+                        required: 'Field Required',
+                        maxlength: 'Character limit exceeded'
+                    }
+                })
+            }
+            var index = GetIndex(this)
+            teamMembers[index] = $(this).val()
+            $('#modifyButton').prop('disabled', IsSame(teamMembers, oldMembersList));
+        });
+
+    });
+
+</script>
+}

@@ -13,5 +13,8 @@ namespace DataAccess.Data.Abstract
         List<string> GetLocations();
         bool TeamIdIsUnique(string teamId);
         bool EmailIdIsUnique(string emailId);
+        bool DoesTeamExist(string teamId);
+        bool IsSecretTokenCorrect(string teamId, string secretToken);
+        List<string> GetTeamMembers(string teamId);
     }
 }

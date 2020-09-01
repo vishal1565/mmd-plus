@@ -189,5 +189,26 @@ namespace DataAccess.Data.Services
         {
             return _userRepo.isEmailUniq(emailId.ToLowerInvariant());
         }
+
+        public bool DoesTeamExist(string teamId)
+        {
+            return _teamBaseRepo.FindBy(team => team.TeamId == teamId).Count() == 1;
+        }
+
+        public bool IsSecretTokenCorrect(string teamId, string secretToken)
+        {
+            return _teamBaseRepo.FindBy(team => team.TeamId == teamId && team.SecretToken == secretToken).Count() == 1;
+        }
+
+        public List<string> GetTeamMembers(string teamId)
+        {
+            var team = _teamBaseRepo.GetSingle(team => team.TeamId == teamId, team => team.Users);
+
+            var memberList = new List<string>();
+
+            team.Users.ToList().ForEach(u => memberList.Add(u.UserId));
+
+            return memberList;
+        }
     }
 }
