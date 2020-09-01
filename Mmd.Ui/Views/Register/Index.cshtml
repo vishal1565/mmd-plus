@@ -9,7 +9,7 @@
     <h3>Register</h3>
     <div class="row">
         <div class="col-sm">
-            <form asp-action="Index">
+            <form asp-action="Index" id="myForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="TeamId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">TeamId</label>
@@ -54,8 +54,10 @@
                 }
             </div>
 
-                <div class="form-group">
+                <div class="form-group row">
                     <input type="submit" value="Register" class="btn btn-primary" />
+                    <span>Already Registered?</span>
+                    @Html.ActionLink("Modify Team", "Modify");
                 </div>
             </form>
         </div>
@@ -129,32 +131,18 @@
                         </div>\
                         `
             newTeamMemberField += `</div>`
+
             $(newTeamMemberField).appendTo($fields);
         }
     }
-
-    function OnSuccess(response) {
-        $("#tblCustomers").DataTable(
-            {
-                bLengthChange: true,
-                lengthMenu: [[5, 10, -1], [5, 10, "All"]],
-                bFilter: true,
-                bSort: true,
-                bPaginate: true,
-                data: response,
-                columns: [{ 'data': 'TeamId' },
-                { 'data': 'Location' },
-                { 'data': 'RegistrationTime' }]
-            });
-    };
 
     $(document).ready(function () {
 
         var statesAvailable = @Html.Raw(ViewBag.CurrentIds);
 
         $.each(statesAvailable, function (i) {
-            console.log(statesAvailable[i])
             teamMembers.push(statesAvailable[i]);
+            console.log('pushing state', i);
             fieldCount++;
         });
 
@@ -183,6 +171,18 @@
 
         $('#teamMembers').on("input", 'input[name*="TeamMembers"]', function (e) {
             e.preventDefault();
+            if (Object.keys($(this).rules()).length == 0) {
+                $(this).rules("add", {
+                    required: true,
+                    email: true,
+                    maxlength: 60,
+                    messages: {
+                        email: 'Invalid Email Address',
+                        required: 'Field Required',
+                        maxlength: 'Character limit exceeded'
+                    }
+                })
+            }
             var index = GetIndex(this)
             teamMembers[index] = $(this).val()
         });

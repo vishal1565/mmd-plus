@@ -23,8 +23,8 @@ namespace mmd_plus.Models
 
     public class TeamMember
     {
-        [Required(ErrorMessage = "TeamMember EmailId Required")]
-        [EmailAddress(ErrorMessage = "Enter a Valid Email Address")]
+        [Required(ErrorMessage = "Field Required")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string EmailId { get; set; }
     }
 

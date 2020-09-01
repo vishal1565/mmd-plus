@@ -23,7 +23,6 @@ namespace mmd_plus.Controllers
             _service = service;
         }
 
-
         void PopulateViewData(RegisterViewModel request)
         {
             var locations = _service.GetLocations();
@@ -106,7 +105,7 @@ namespace mmd_plus.Controllers
                     responseModel.Message.Type = "error";
                 else
                     responseModel.Message.Type = "success";
-
+                ModelState.Clear();
                 responseModel.Message.Message = message;
                 return View(responseModel);
 
@@ -120,7 +119,7 @@ namespace mmd_plus.Controllers
             if (!_service.TeamIdIsUnique(request.TeamId))
                 ModelState.AddModelError("TeamId", "TeamId already exists");
             for (var i = 0;i < request.TeamMembers.Count;i++)
-                if (!_service.EmailIdIsUnique(request.TeamMembers[i].EmailId))
+                if (!string.IsNullOrWhiteSpace(request.TeamMembers[i].EmailId) && !_service.EmailIdIsUnique(request.TeamMembers[i].EmailId))
                     ModelState.AddModelError($"TeamMembers[{i}].EmailId", "User already registered");
             if (request.Location == "Select")
                 ModelState.AddModelError("Location", "Specify a Location");
@@ -132,7 +131,8 @@ namespace mmd_plus.Controllers
             var newTeamMembers = new List<string>();
 
             foreach (var tm in request.TeamMembers)
-                newTeamMembers.Add(tm.EmailId.ToLowerInvariant());
+                if(!string.IsNullOrWhiteSpace(tm.EmailId))
+                    newTeamMembers.Add(tm.EmailId.ToLowerInvariant());
 
             return new RegisterTeam
             {
