@@ -197,6 +197,7 @@ namespace mmd_plus.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 ModelState.Clear();
                 var model = new ModifyTeamViewModel
                 {
