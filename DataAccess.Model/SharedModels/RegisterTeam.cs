@@ -11,4 +11,11 @@ namespace DataAccess.Model.SharedModels
         public string Location { get; set; }
         public DateTime RequestTime { get; set; }
     }
+
+    public class RegisteredTeam
+    {
+        public string TeamId { get; set; }
+        public string Location { get; set; }
+        public DateTime RegistrationTime { get; set; }
+    }
 }
