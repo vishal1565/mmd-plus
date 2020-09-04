@@ -6,11 +6,11 @@ namespace DataAccess.Model.SharedModels
 {
     public class NotificationContent
     {
-        public List<string> Senders { get; set; }
+        public string Sender { get; set; }
         public List<string> Recievers { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public string CcUsers { get; set; }
-        public string BccUsers { get; set; }
+        public List<string> CcUsers { get; set; }
+        public List<string> BccUsers { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using DataAccess.Data;
 using DataAccess.Data.Abstract;
@@ -58,6 +59,21 @@ namespace mmd_plus
                         throw new KeyNotFoundException();
                 }
             });
+
+            var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST");
+
+            if (!string.IsNullOrWhiteSpace(smtpHost))
+            {
+                services.AddScoped<INotificationService,EmailNotificationService>();
+                services.AddSingleton(factory =>
+                {
+                    return new SmtpClient(smtpHost)
+                    {
+                        UseDefaultCredentials = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network
+                    };
+                });
+            }
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 
