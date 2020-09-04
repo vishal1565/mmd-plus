@@ -187,7 +187,7 @@ namespace DataAccess.Data.Services
 
         public bool EmailIdIsUnique(string emailId)
         {
-            return _userRepo.isEmailUniq(emailId.ToLowerInvariant());
+            return _userRepo.IsEmailUniq(emailId.ToLowerInvariant());
         }
 
         public bool DoesTeamExist(string teamId)
@@ -209,6 +209,65 @@ namespace DataAccess.Data.Services
             team.Users.ToList().ForEach(u => memberList.Add(u.UserId));
 
             return memberList;
+        }
+
+        public bool UpdateTeamMembers(string teamId, List<string> newTeamMembers)
+        {
+            try
+            {
+                var oldTeamMembers = _context.Users.Where(user => user.TeamId == teamId).Select(user => user.UserId).ToList();
+
+                var currentTeam = _teamBaseRepo.GetSingle(team => team.TeamId == teamId);
+
+                var teamMembersToDelete = new List<string>();
+                var teamMembersToAdd = new List<string>();
+
+                foreach (var tm in oldTeamMembers)
+                {
+                    if (!newTeamMembers.Contains(tm))
+                        teamMembersToDelete.Add(tm);
+                }
+
+                foreach (var tm in newTeamMembers)
+                {
+                    if (!oldTeamMembers.Contains(tm))
+                        teamMembersToAdd.Add(tm);
+                }
+
+                if (teamMembersToAdd.Count == 0 && teamMembersToDelete.Count == 0)
+                    return false;
+
+                // Delete
+
+                foreach (var tm in teamMembersToDelete)
+                {
+                    _userBaseRepo.DeleteWhere(user => user.UserId == tm);
+                }
+
+                // Add
+
+                foreach (var tm in teamMembersToAdd)
+                {
+                    if (EmailIdIsUnique(tm))
+                        _userBaseRepo.Add(new User { UserId = tm, TeamId = teamId, AddedAt = DateTime.UtcNow });
+                }
+
+                currentTeam.LastUpdatedAt = DateTime.UtcNow;
+
+                _userBaseRepo.Commit();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"TeamMembers Change Failed, {ex}");
+                return false;
+            }
+        }
+
+        public bool EmailIdIsUnique(string userId, string teamId)
+        {
+            return _userRepo.IsEmailUniq(userId, teamId);
         }
     }
 }

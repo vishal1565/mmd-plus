@@ -142,7 +142,6 @@
 
         $.each(statesAvailable, function (i) {
             teamMembers.push(statesAvailable[i]);
-            console.log('pushing state', i);
             fieldCount++;
         });
 
@@ -176,10 +175,12 @@
                     required: true,
                     email: true,
                     maxlength: 60,
+                    regex: emailValidationRegex,
                     messages: {
                         email: 'Invalid Email Address',
                         required: 'Field Required',
-                        maxlength: 'Character limit exceeded'
+                        maxlength: 'Character limit exceeded',
+                        regex: 'Invalid Email Address'
                     }
                 })
             }

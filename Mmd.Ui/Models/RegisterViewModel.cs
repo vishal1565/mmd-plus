@@ -1,4 +1,5 @@
 ﻿using DataAccess.Model;
+using DataAccess.Model.SharedModels;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using System;
 using System.Collections.Generic;
@@ -20,13 +21,6 @@ namespace mmd_plus.Models
         public string Location { get; set; }
 
         public ModalMessage Message { get; set; }
-    }
-
-    public class TeamMember
-    {
-        [Required(ErrorMessage = "Field Required"), StringLength(60, ErrorMessage = "Character Limit Exceeded")]
-        [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        public string EmailId { get; set; }
     }
 
     public class ModalMessage

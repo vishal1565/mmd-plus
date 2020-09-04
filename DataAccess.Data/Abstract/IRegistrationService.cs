@@ -16,5 +16,7 @@ namespace DataAccess.Data.Abstract
         bool DoesTeamExist(string teamId);
         bool IsSecretTokenCorrect(string teamId, string secretToken);
         List<string> GetTeamMembers(string teamId);
+        bool UpdateTeamMembers(string teamId, List<string> teamMembers);
+        bool EmailIdIsUnique(string user, string v);
     }
 }

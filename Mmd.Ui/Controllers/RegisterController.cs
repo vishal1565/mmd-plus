@@ -195,17 +195,35 @@ namespace mmd_plus.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult ChangeTeamMembers(ModifyTeamViewModel request)
         {
+            var userList = request.TeamMembers.Select(tm => tm.EmailId.ToLowerInvariant()).ToList();
+
+            for(var i = 0;i < userList.Count;i++)
+                if (!_service.EmailIdIsUnique(userList[i], request.TeamId.ToLowerInvariant()))
+                    ModelState.AddModelError($"TeamMembers[{i}].EmailId", "User Already Registered");
+            
             if (ModelState.IsValid)
             {
+                // Change the teamMembers
+                bool successFul = _service.UpdateTeamMembers(request.TeamId.ToLowerInvariant(), userList);
 
-                ModelState.Clear();
                 var model = new ModifyTeamViewModel
                 {
                     TeamId = "",
                     SecretToken = ""
                 };
+
+                ModelState.Clear();
                 PopulateModifyTeamViewBag(model, false);
-                return View("ModifyTeam", model);
+                if (successFul)
+                {
+                    model.Message = new ModalMessage { Type = "success", Message = "Team Change SucessFul" };
+                    return View("ModifyTeam", model);
+                }
+                else
+                {
+                    model.Message = new ModalMessage { Type = "error", Message = "Change Failed" };
+                    return View("ModifyTeam", model);
+                }
             }
             
             PopulateModifyTeamViewBag(request, true);
