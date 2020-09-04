@@ -5,6 +5,7 @@ using DataAccess.Model.SharedModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
+using NotificationService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,9 @@ namespace DataAccess.Data.Services
         private readonly ILogger<RegistrationService> _logger;
         private readonly ITeamRepository _teamRepo;
         private readonly IUserRepository _userRepo;
+        private readonly INotificationService _emailNotificationService;
 
-        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo)
+        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo, Func<string, INotificationService> serviceAccessor)
         {
             _context = context;
             _teamBaseRepo = teamBaseRepo;
@@ -29,6 +31,7 @@ namespace DataAccess.Data.Services
             _logger = logger;
             _teamRepo = teamRepo;
             _userRepo = userRepo;
+            _emailNotificationService = serviceAccessor("Email");
         }
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
@@ -123,6 +126,8 @@ namespace DataAccess.Data.Services
                     if (locationId == null)
                         throw new Exception("Invalid location provided in request form");
 
+                    var newToken = Guid.NewGuid().ToString("N");
+
                     // Register New Team
                     var newTeam = new Team
                     {
@@ -130,7 +135,7 @@ namespace DataAccess.Data.Services
                         Location = locationId.LocationId,
                         RegisteredAt = validRegisterTeam.RequestTime,
                         LastUpdatedAt = validRegisterTeam.RequestTime,
-                        SecretToken = Guid.NewGuid().ToString("N"),
+                        SecretToken = newToken,
                     };
 
                     var Users = new List<User>();
@@ -145,6 +150,11 @@ namespace DataAccess.Data.Services
                     _teamBaseRepo.Commit();
 
                     msg = "Registration Success";
+
+                    if (SendRegistrationEmail(newTeam.TeamId, newToken, newTeam.Users))
+                        _logger.LogWarning($"Registration Email Sent for {newTeam.TeamId}");
+                    else
+                        _logger.LogError($"Email send failure for team {newTeam.TeamId}");
                 }
                 else
                 {
@@ -256,6 +266,11 @@ namespace DataAccess.Data.Services
 
                 _userBaseRepo.Commit();
 
+                if (SendTeamChangeEmail(teamId, GetTeamMembers(teamId)))
+                    _logger.LogWarning($"Team Update Email sent for {teamId}");
+                else
+                    _logger.LogError($"Team Update Email sent failure for {teamId}");
+
                 return true;
             }
             catch (Exception ex)
@@ -263,6 +278,24 @@ namespace DataAccess.Data.Services
                 _logger.LogError($"TeamMembers Change Failed, {ex}");
                 return false;
             }
+        }
+
+        private bool SendTeamChangeEmail(string teamId, List<string> teamMembers)
+        {
+            return _emailNotificationService.Notify(new NotificationContent
+            {
+                Subject = "CodeComp - Team Change Successful",
+                Recievers = teamMembers
+            });
+        }
+
+        private bool SendRegistrationEmail(string teamId, string newToken, ICollection<User> users)
+        {
+            return _emailNotificationService.Notify(new NotificationContent
+            {
+                Subject = "CodeComp - Team Registration Successful",
+                Recievers = users.Select(u => u.UserId).ToList()
+            });
         }
 
         public bool EmailIdIsUnique(string userId, string teamId)

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NotificationService;
 
 namespace mmd_plus
 {
@@ -44,6 +45,19 @@ namespace mmd_plus
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IRegistrationService, RegistrationService>();
+
+            services.AddScoped<EmailNotificationService>();
+
+            services.AddScoped<Func<string, INotificationService>>(ServiceProvider => key =>
+            {
+                switch (key)
+                {
+                    case "Email":
+                        return ServiceProvider.GetService<EmailNotificationService>();
+                    default:
+                        throw new KeyNotFoundException();
+                }
+            });
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 
