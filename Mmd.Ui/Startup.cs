@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using DataAccess.Data;
 using DataAccess.Data.Abstract;
@@ -46,7 +48,7 @@ namespace mmd_plus
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IRegistrationService, RegistrationService>();
 
-            services.AddScoped<EmailNotificationService>();
+            //services.AddScoped<INotificationService, EmailNotificationService>();
 
             services.AddScoped<Func<string, INotificationService>>(ServiceProvider => key =>
             {
@@ -58,6 +60,26 @@ namespace mmd_plus
                         throw new KeyNotFoundException();
                 }
             });
+
+            var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST");
+
+            if (!string.IsNullOrWhiteSpace(smtpHost))
+            {
+                services.AddScoped<INotificationService,EmailNotificationService>();
+                var fromAddress = new MailAddress(Environment.GetEnvironmentVariable("FROM_ADDRESS"), "Meghraj@CodeComp");
+                var fromPassword = Environment.GetEnvironmentVariable("FROM_PASSWORD");
+                services.AddSingleton(factory =>
+                {
+                    return new SmtpClient(smtpHost)
+                    {
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                    };
+                });
+            }
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 
