@@ -23,7 +23,7 @@ namespace DataAccess.Data.Services
         private readonly IUserRepository _userRepo;
         private readonly INotificationService _emailNotificationService;
 
-        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo, INotificationService notificationService)
+        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo, Func<string, INotificationService> notificationServiceAccessor)
         {
             _context = context;
             _teamBaseRepo = teamBaseRepo;
@@ -31,7 +31,7 @@ namespace DataAccess.Data.Services
             _logger = logger;
             _teamRepo = teamRepo;
             _userRepo = userRepo;
-            _emailNotificationService = notificationService;
+            _emailNotificationService = notificationServiceAccessor("Email");
         }
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
