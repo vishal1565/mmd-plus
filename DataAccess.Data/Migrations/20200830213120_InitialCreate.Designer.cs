@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200827181654_AutoIncrementedId")]
-    partial class AutoIncrementedId
+    [Migration("20200830213120_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,26 @@ namespace DataAccess.Data.Migrations
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("DataAccess.Model.Location", b =>
+                {
+                    b.Property<string>("LocationId")
+                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.HasKey("LocationId");
+
+                    b.ToTable("Locations");
+                });
 
             modelBuilder.Entity("DataAccess.Model.Team", b =>
                 {
@@ -36,7 +56,7 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Location")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("timestamp with time zone");
@@ -46,6 +66,8 @@ namespace DataAccess.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("TeamId");
+
+                    b.HasIndex("Location");
 
                     b.ToTable("Teams");
                 });
@@ -74,6 +96,15 @@ namespace DataAccess.Data.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DataAccess.Model.Team", b =>
+                {
+                    b.HasOne("DataAccess.Model.Location", "LocationNav")
+                        .WithMany("Teams")
+                        .HasForeignKey("Location")
+                        .HasConstraintName("FK_Team_Loc")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("DataAccess.Model.User", b =>

@@ -9,7 +9,7 @@
     <h3>Register</h3>
     <div class="row">
         <div class="col-sm">
-            <form asp-action="Index">
+            <form asp-action="Index" id="myForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="TeamId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">TeamId</label>
@@ -18,7 +18,9 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Location" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">Location</label>
-                    <select asp-for="Location" class="form-control mb-3 w-75" asp-items="ViewBag.Location"></select>
+                    <select asp-for="Location" class="form-control mb-3 w-75" asp-items="ViewBag.Location" >
+                        <option>Select</option>
+                    </select>
                     <span asp-validation-for="Location" class="text-danger"></span>
                 </div>
 
@@ -26,16 +28,16 @@
                 @for (var i = 0; i < Model.TeamMembers.Count; i++)
                 {
                     var currentLabel = $"TeamMember {i + 1}";
-                    var buttonId = $"btnDelField{i}";
-                    var divId = $"teamMemberDiv{i}";
+                    var buttonId = $"btnDelField_{i}";
+                    var divId = $"teamMemberDiv_{i}";
                     <div class="row align-items-end" id="@divId">
                         <div class="form-group col-sm-7">
                             <label asp-for="TeamMembers[i].EmailId" class="control-label" style="margin-bottom: .1rem;font-weight: 500;">@currentLabel</label>
                             <input type="text" class="form-control mb-3" asp-for="TeamMembers[i].EmailId" />
                             <span asp-validation-for="TeamMembers[i].EmailId" class="text-danger"></span>
                         </div>
-                        <div id="delBtnDiv0">
-                            @if (Model.TeamMembers.Count > 1)
+                        <div id="delBtnDiv_0">
+                            @if (i > 0)
                             {
                                 <div class="col-sm-2">
                                     <button id="@buttonId" type="button" class="btn btn-danger">Delete</button>
@@ -52,13 +54,36 @@
                 }
             </div>
 
-                <div class="form-group">
+                <div class="form-group row">
                     <input type="submit" value="Register" class="btn btn-primary" />
+                    <span>Already Registered? </span>
+                    @Html.ActionLink(" Modify Team", "ModifyTeam");
                 </div>
             </form>
         </div>
         <div class="col-sm">
-            One of two columns
+            <table id="index" class="table table-striped table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>TeamName</th>
+                        <th>Location</th>
+                        <th>RegistrationTime</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade col-md-4" style="top: 80%" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@Model.Message.Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -67,77 +92,166 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script type="text/javascript">
 
+    var teamMembers = new Array()
+
+    var fieldCount = 0
+
     GetIndex = (context) => {
+        // works when element id is in form string_index
         var id = $(context).attr("id");
-        var index = id[id.length - 1]
+        var c = id.split('_')[1]
+        var index = parseInt(c)
         return index
     }
 
-    $(document).ready(function () {
-        var teamMembers = [""];
-
-        $('#teamMembers').on("click", '#btnAddField', function (e) {
-            e.preventDefault();
+    GenerateFields = () => {
+        $('#teamMembers').empty();
+        for (var n = 0; n < teamMembers.length; n++) {
             var $fields = $('#teamMembers');
-            var n = teamMembers.length
             var newTeamMemberField = `\
-                    <div class="row align-items-end" id="teamMemberDiv${n}">\
-                        <div class="form-group col-sm-7">\
-                            <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n+1}</label>\
-                            <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = ""/>\
-                            <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
-                        </div>\
-                        <div id="delBtnDiv${n}">\
-                            <div class="col-sm-2">\
-                                <button id="btnDelField${n}" type = "button" class="btn btn-danger"> Delete</button>\
-                            </div>\
-                        </div >\
-                    </div>`
-            teamMembers.push("");
-            $(newTeamMemberField).appendTo($fields);
-        });
-
-        $('#teamMembers').on("click", 'button[id*="btnDelField"]', function (e) {
-            e.preventDefault();
-            var index = GetIndex(this)
-            teamMembers.splice(index, 1)
-            var totalElements = teamMembers.length
-            console.log(totalElements)
-            $('#teamMembers').empty();
-            for (var n = 0; n < teamMembers.length; n++) {
-                var $fields = $('#teamMembers');
-                var newTeamMemberField = `\
-                    <div class="row align-items-end" id="teamMemberDiv${n}">\
+                    <div class="row align-items-end" id="teamMemberDiv_${n}">\
                         <div class="form-group col-sm-7">\
                             <label class="control-label" style="margin-bottom: .1rem;font-weight: 500;" for="TeamMembers_${n}__EmailId">TeamMember ${n + 1}</label>\
                             <input type="text" class="form-control mb-3" data-val="true" data-val-email="The EmailId field is not a valid e-mail address." data-val-required="Email Id Required" id="TeamMembers_${n}__EmailId" name="TeamMembers[${n}].EmailId" value = "${teamMembers[n]}"/>\
                             <span class="text-danger field-validation-valid" data-valmsg-for="TeamMembers[${n}].EmailId" data-valmsg-replace="true"></span>\
-                        </div>\ 
+                        </div>\
                     `
-                if (teamMembers.length > 1)
-                    newTeamMemberField = newTeamMemberField +
-                        `<div id="delBtnDiv${n}">\
+            if (n > 0)
+                newTeamMemberField = newTeamMemberField +
+                    `<div id="delBtnDiv_${n}">\
                             <div class="col-sm-2">\
-                                <button id="btnDelField${n}" type = "button" class="btn btn-danger"> Delete</button>\
+                                <button id="btnDelField_${n}" type = "button" class="btn btn-danger"> Delete</button>\
                             </div>\
                         </div >\
                         `
-                if (n == 0)
-                    newTeamMemberField = newTeamMemberField + 
-                        `<div class="col-sm-2">\
+            if (n == 0 && fieldCount < 5)
+                newTeamMemberField = newTeamMemberField +
+                    `<div class="col-sm-2">\
                             <button id="btnAddField" type="button" class="btn btn-success">Add</button>\
                         </div>\
                         `
-                newTeamMemberField += `</div>`
-                $(newTeamMemberField).appendTo($fields);
-            }
+            newTeamMemberField += `</div>`
+
+            $(newTeamMemberField).appendTo($fields);
+        }
+    }
+
+    $(document).ready(function () {
+
+        var statesAvailable = @Html.Raw(ViewBag.CurrentIds);
+
+        $.each(statesAvailable, function (i) {
+            teamMembers.push(statesAvailable[i]);
+            fieldCount++;
+        });
+
+        if ('@Model.Message.Message'.length > 0) {
+            if ('@Model.Message.Type' === 'success')
+                $('.modal-content').css('background-color', '#339933')
+            if ('@Model.Message.Type' === 'error')
+                $('.modal-content').css('background-color', '#ff4d4d')
+
+            $('#exampleModal').modal('show')
+        }
+
+        $('#teamMembers').on("click", '#btnAddField', function (e) {
+            e.preventDefault();
+            fieldCount++;
+            teamMembers.push("");
+            GenerateFields()
+        });
+
+        $('#teamMembers').on("click", 'button[id*="btnDelField"]', function (e) {
+            e.preventDefault();
+            fieldCount--;
+            teamMembers.splice(GetIndex(this), 1)
+            GenerateFields()
         })
 
         $('#teamMembers').on("input", 'input[name*="TeamMembers"]', function (e) {
             e.preventDefault();
+            if (Object.keys($(this).rules()).length == 0) {
+                $(this).rules("add", {
+                    required: true,
+                    email: true,
+                    maxlength: 60,
+                    regex: emailValidationRegex,
+                    messages: {
+                        email: 'Invalid Email Address',
+                        required: 'Field Required',
+                        maxlength: 'Character limit exceeded',
+                        regex: 'Invalid Email Address'
+                    }
+                })
+            }
             var index = GetIndex(this)
             teamMembers[index] = $(this).val()
         });
+
+        $('#index thead tr').clone(true).appendTo('#index thead');
+
+        $('#index thead tr:eq(1) th').each(function (i) {
+            var title = $(this).text();
+
+            switch (title) {
+                case "Type":
+                    $(this).html('some html to render');
+
+                    $('select', this).on('change', function () {
+                        if (table.column(i).search() !== this.value) {
+                            table.column(i).search(this.value).draw();
+                        }
+                    });
+                    break;
+                case "Id":
+                case "RegistrationTime":
+                    $(this).html('    ');
+                    break;
+                default:
+                    $(this).html('<input style="width: 100%;" type="text" placeholder="' + title + '"/>');
+
+                    $('input', this).on('keyup change', function () {
+                        if (table.column(i).search !== this.value) {
+                            table.column(i).search(this.value).draw();
+                        }
+                    });
+                    break;
+            }
+        });
+
+        var table = $('#index').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderCellsTop": true,
+            "fixedHeader": true,
+            "scrollY": 400,
+            "scrollX": true,
+            //"scrollCollapse": true,
+            "fixedColumns": true,
+            "sDom": '<"top"l>rt<"bottom"ip><"clear">',
+            "ajax": {
+                "url": '@Url.Action("LoadData", "Register")',
+                "dataType": "json"
+            },
+            "order": [[2, "desc"]],
+            "columnDefs": [
+                { targets: 2, render: function (data, type, row) { return displayDate(data); } }
+            ],
+            "columns": [
+                //{ "data": "id", "width": "30px" },
+                { "data": "teamId", "autoWidth": true },
+                { "data": "location", "autoWidth": true },
+                { "data": "registrationTime", "autoWidth": true },
+                @*{
+                    "data": "name", "width": "200px",
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html("<a href='@Url.Action("Manage", "IndexManagement")/" + oData.id + "'>");
+                    }
+
+                }*@
+            ],
+
+        })
     });
 
 </script>

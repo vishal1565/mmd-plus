@@ -10,10 +10,16 @@ namespace DataAccess.Data.Repositories
     {
         public UserRepository(DataContext context) : base(context) { }
 
-        public bool isEmailUniq(string email)
+        public bool IsEmailUniq(string email)
         {
             var user = this.GetSingle(u => u.UserId == email);
             return user == null;
+        }
+
+        public bool IsEmailUniq(string email, string teamId)
+        {
+            var user = this.GetSingle(u => u.UserId == email);
+            return user == null || user.TeamId == teamId;
         }
     }
 }
