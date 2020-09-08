@@ -1,5 +1,0 @@
-steps:
-- name: 'gcr.io/$PROJECT_ID/dotnet'
-  args: ['publish', '-c', 'Release', '-o', 'MyPublish']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', './MyPublish/app.yaml']
