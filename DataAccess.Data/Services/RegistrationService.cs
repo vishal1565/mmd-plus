@@ -23,7 +23,7 @@ namespace DataAccess.Data.Services
         private readonly IUserRepository _userRepo;
         private readonly INotificationService _emailNotificationService;
 
-        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo, Func<string, INotificationService> serviceAccessor)
+        public RegistrationService(DataContext context, IEntityBaseRepository<Team> teamBaseRepo, IEntityBaseRepository<User> userBaseRepo, ILogger<RegistrationService> logger, ITeamRepository teamRepo, IUserRepository userRepo, INotificationService notificationService)
         {
             _context = context;
             _teamBaseRepo = teamBaseRepo;
@@ -31,7 +31,7 @@ namespace DataAccess.Data.Services
             _logger = logger;
             _teamRepo = teamRepo;
             _userRepo = userRepo;
-            _emailNotificationService = serviceAccessor("Email");
+            _emailNotificationService = notificationService;
         }
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
@@ -291,11 +291,21 @@ namespace DataAccess.Data.Services
 
         private bool SendRegistrationEmail(string teamId, string newToken, ICollection<User> users)
         {
-            return _emailNotificationService.Notify(new NotificationContent
+            bool a = false;
+            var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
+            var notificationContent = new NotificationContent
             {
                 Subject = "CodeComp - Team Registration Successful",
-                Recievers = users.Select(u => u.UserId).ToList()
-            });
+                Recievers = users.Select(u => u.UserId).ToList(),
+                Sender = sender,
+                CcUsers = new List<string>(),
+                BccUsers = new List<string>(),
+                Body = "Test email",
+            };
+
+            a = _emailNotificationService.Notify(notificationContent);
+
+            return a;
         }
 
         public bool EmailIdIsUnique(string userId, string teamId)

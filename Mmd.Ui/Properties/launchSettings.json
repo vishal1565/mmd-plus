@@ -21,8 +21,10 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SUPPORT_EMAIL": "",//support_email
-        "SMTP_HOST": ""//smtp host
+        "SUPPORT_EMAIL": "", //support_email
+        "SMTP_HOST": "smtp.gmail.com", //smtp host
+        "FROM_ADDRESS": "",//from address,
+         "FROM_PASSWORD" : ""//from password
       }
     }
   }
