@@ -282,16 +282,21 @@ namespace DataAccess.Data.Services
 
         private bool SendTeamChangeEmail(string teamId, List<string> teamMembers)
         {
+            var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
+
             return _emailNotificationService.Notify(new NotificationContent
             {
                 Subject = "CodeComp - Team Change Successful",
-                Recievers = teamMembers
+                Recievers = teamMembers,
+                Sender = sender,
+                CcUsers = new List<string>(),
+                BccUsers = new List<string>(),
+                Body = "Test email",
             });
         }
 
         private bool SendRegistrationEmail(string teamId, string newToken, ICollection<User> users)
         {
-            bool a = false;
             var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
             var notificationContent = new NotificationContent
             {
@@ -303,9 +308,7 @@ namespace DataAccess.Data.Services
                 Body = "Test email",
             };
 
-            a = _emailNotificationService.Notify(notificationContent);
-
-            return a;
+            return _emailNotificationService.Notify(notificationContent);
         }
 
         public bool EmailIdIsUnique(string userId, string teamId)
