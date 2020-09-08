@@ -17,7 +17,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
   </ItemGroup>
-		
+
   <ItemGroup>
     <Content Remove="wwwroot\favicon.ico" />
   </ItemGroup>
@@ -31,5 +31,10 @@
     <ProjectReference Include="..\DataAccess.Model\DataAccess.Model.csproj" />
     <ProjectReference Include="..\DataAccess.Data\DataAccess.Data.csproj" />
     <ProjectReference Include="..\NotificationService\NotificationService.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+      <None Update="app.yaml">
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
 </Project>
