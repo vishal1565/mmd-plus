@@ -7,6 +7,7 @@ env_variables:
   SMTP_HOST: "smtp.gmail.com"
   FROM_ADDRESS: "a@codecomp.com"
   FROM_PASSWORD: "password"
+  ASPNETCORE_ENVIRONMENT: Development
 
 manual_scaling:
   instances: 1
