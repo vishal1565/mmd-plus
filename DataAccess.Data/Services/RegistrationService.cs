@@ -36,6 +36,8 @@ namespace DataAccess.Data.Services
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
         {
+
+            bool a = _emailNotificationService.Notify(new NotificationContent());
             IQueryable<Team> query = null;
 
             totalCount = _teamBaseRepo.Count();

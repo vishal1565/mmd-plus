@@ -22,9 +22,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SUPPORT_EMAIL": "", //support_email
-        "SMTP_HOST": "smtp.gmail.com", //smtp host
-        "FROM_ADDRESS": "",//from address,
-         "FROM_PASSWORD" : ""//from password
+        "SMTP_HOST": "smtp.mailgun.org", //smtp host
       }
     }
   }
