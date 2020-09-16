@@ -12,15 +12,10 @@ namespace mmd_plus.Controllers
 {
     public class HomeController : Controller
     {
-        private INotificationService _nService;
-
-        public HomeController(INotificationService service)
-        {
-            _nService = service;
-        }
+      
         public IActionResult Index()
         {
-            _nService.Notify(new NotificationContent());
+           
             return View();
         }
 

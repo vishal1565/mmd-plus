@@ -1,38 +1,59 @@
 ﻿using DataAccess.Model.SharedModels;
 using System;
-using System.IO;
-using System;
-using System.IO;
-using RestSharp;
-using RestSharp.Authenticators;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Text;
 
 namespace NotificationService
 {
     public class EmailNotificationService : INotificationService
     {
+        private SmtpClient Client { get; set; }
+
+        public EmailNotificationService(SmtpClient client)
+        {
+            Client = client;
+        }
+
         public bool Notify(NotificationContent content)
         {
-            Console.WriteLine(SendSimpleMessage().Content.ToString());
+
+            //if (string.IsNullOrEmpty(content.Sender)) throw new ArgumentNullException("Sender");  //Uncomment these lines in final code
+            //if (content.Recievers == null || content.Recievers.Count == 0) throw new ArgumentNullException("Receivers");
+
+            MailMessage mail = new MailMessage
+            {
+                From = new MailAddress("meghraj-manikrao.jagtap@db.com")
+                //From = new MailAddress(content.Sender)
+            };
+
+            //foreach (var item in content.CcUsers)
+            //{
+            //    mail.CC.Add(new MailAddress(item));
+            //};
+
+            //foreach (var item in content.Recievers)
+            //{
+            //    mail.To.Add(new MailAddress(item));
+            //};
+
+            //temporary code till we get domain
+            mail.To.Add(new MailAddress("itsmemeghraj@gmail.com"));
+            mail.Subject = "Hi from inside codecomp3";//content.Subject;
+            mail.Body = content.Body;
+            mail.IsBodyHtml = true;
+
+            try
+            {
+                Client.Send(mail);
+                Console.WriteLine(".....Mail sent....");
+            }
+            catch (SmtpFailedRecipientException e)
+            {
+                Console.WriteLine(e);
+            }
             return true;
 
-        }
-        public static IRestResponse SendSimpleMessage()
-        {
-            RestClient client = new RestClient();
-            client.BaseUrl = new Uri("https://api.mailgun.net/v3");
-            client.Authenticator =
-                new HttpBasicAuthenticator("api",
-                                            "386341fda5ba13481a4317a9945ad48d-0f472795-8f637e50");
-            RestRequest request = new RestRequest();
-            request.AddParameter("domain", "sandbox3b061363637248538d0180df369c297b.mailgun.org", ParameterType.UrlSegment);
-            request.Resource = "{domain}/messages";
-            request.AddParameter("from", "Excited User <meghraj-manikrao.jagtap@db.com>");
-            request.AddParameter("to", "itsmemeghraj@gmail.com");
-            //request.AddParameter("to", "YOU@YOUR_DOMAIN_NAME");
-            request.AddParameter("subject", "Hello");
-            request.AddParameter("text", "Testing some Mailgun awesomness!");
-            request.Method = Method.POST;
-            return client.Execute(request);
         }
     }
 }

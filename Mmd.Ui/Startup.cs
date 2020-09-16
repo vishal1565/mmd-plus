@@ -48,25 +48,28 @@ namespace mmd_plus
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IRegistrationService, RegistrationService>();
 
-            services.AddScoped<INotificationService, EmailNotificationService>();
-
-            //services.AddScoped<Func<string, INotificationService>>(ServiceProvider => key =>
-            //{
-            //    switch (key)
-            //   {
-            //        case "Email":
-            //           return ServiceProvider.GetService<EmailNotificationService>();
-            //        default:
-            //            throw new KeyNotFoundException();
-            //    }
-            //});
-
-           
-
-           
-          
-               
             
+
+            var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST");
+
+            if (!string.IsNullOrWhiteSpace(smtpHost))
+            {
+                services.AddScoped<INotificationService, EmailNotificationService>();
+                services.AddSingleton(factory =>
+                {
+                    NetworkCredential nc = new NetworkCredential();
+                    nc.UserName = Environment.GetEnvironmentVariable("SMTP_USERNAME");
+                    nc.Password = Environment.GetEnvironmentVariable("SMTP_PWD");
+                    return new SmtpClient(smtpHost)
+                    {
+                        Port = 587,
+                        Credentials = nc,
+                        DeliveryMethod = SmtpDeliveryMethod.Network
+
+                    };
+                });
+            }
+ 
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 

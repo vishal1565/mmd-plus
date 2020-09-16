@@ -36,8 +36,6 @@ namespace DataAccess.Data.Services
 
         public List<RegisteredTeam> GetRegisteredTeams(Dictionary<string, string> searchValues, string sortColumn, string sortDir, int start, int length, out int filteredCount, out int totalCount)
         {
-
-            bool a = _emailNotificationService.Notify(new NotificationContent());
             IQueryable<Team> query = null;
 
             totalCount = _teamBaseRepo.Count();
@@ -46,7 +44,7 @@ namespace DataAccess.Data.Services
 
             query = GetQuery(query, sortColumn, sortDir);
 
-            foreach(var x in searchValues)
+            foreach (var x in searchValues)
             {
                 query = AddSearchParameter(query, x.Key, x.Value.ToLowerInvariant());
             }
@@ -78,7 +76,7 @@ namespace DataAccess.Data.Services
         private IQueryable<Team> AddSearchParameter(IQueryable<Team> query, string key, string value)
         {
             IQueryable<Team> _query = query;
-            switch(key)
+            switch (key)
             {
                 case "id": return query.Where(t => t.Id.ToString().Contains(value));
                 case "teamId": return query.Where(t => t.TeamId.Contains(value));
@@ -90,7 +88,7 @@ namespace DataAccess.Data.Services
 
         private IQueryable<Team> GetQuery(IQueryable<Team> query, string sortColumn, string sortDir)
         {
-            if(sortDir == "asc")
+            if (sortDir == "asc")
             {
                 switch (sortColumn)
                 {
@@ -179,7 +177,7 @@ namespace DataAccess.Data.Services
 
                 return msg;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Registration Failed | {validRegisterTeam.TeamId} | {validRegisterTeam.Location}");
                 _logger.LogError($"{ex}");
@@ -284,30 +282,49 @@ namespace DataAccess.Data.Services
 
         private bool SendTeamChangeEmail(string teamId, List<string> teamMembers)
         {
-            return _emailNotificationService.Notify(new NotificationContent
+            try
             {
-                Subject = "CodeComp - Team Change Successful",
-                Recievers = teamMembers
-            });
+                var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
+
+                return _emailNotificationService.Notify(new NotificationContent
+                {
+                    Subject = "CodeComp - Team Change Successful",
+                    Recievers = teamMembers,
+                    Sender = sender,
+                    CcUsers = new List<string>(),
+                    BccUsers = new List<string>(),
+                    Body = "Test email",
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"EmailNotification for Team Change Failed | {teamId} | {ex}");
+                return false;
+            }
         }
 
         private bool SendRegistrationEmail(string teamId, string newToken, ICollection<User> users)
         {
-            bool a = false;
-            var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
-            var notificationContent = new NotificationContent
+            try
             {
-                Subject = "CodeComp - Team Registration Successful",
-                Recievers = users.Select(u => u.UserId).ToList(),
-                Sender = sender,
-                CcUsers = new List<string>(),
-                BccUsers = new List<string>(),
-                Body = "Test email",
-            };
+                var sender = Environment.GetEnvironmentVariable("FROM_ADDRESS");
+                var notificationContent = new NotificationContent
+                {
+                    Subject = "CodeComp - Team Registration Successful",
+                    Recievers = users.Select(u => u.UserId).ToList(),
+                    Sender = sender,
+                    CcUsers = new List<string>(),
+                    BccUsers = new List<string>(),
+                    Body = "Test email",
+                };
 
-            a = _emailNotificationService.Notify(notificationContent);
-
-            return a;
+                return _emailNotificationService.Notify(notificationContent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"EmailNotification for Team Registration Failed | {teamId} | {ex}");
+                return false;
+            }
         }
 
         public bool EmailIdIsUnique(string userId, string teamId)

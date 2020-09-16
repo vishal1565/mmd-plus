@@ -21,8 +21,13 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SUPPORT_EMAIL": "", //support_email
-        "SMTP_HOST": "smtp.mailgun.org", //smtp host
+        "SUPPORT_EMAIL": "test_support@db.com", //support_email
+        "FROM_ADDRESS": "test@db.com",
+        "SMTP_HOST": "", //smtp host
+        "SMTP_USERNAME": "", 
+        "SMTP_PWD": ""
+
+
       }
     }
   }
