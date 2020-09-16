@@ -22,7 +22,6 @@
     <Content Remove="wwwroot\favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Register\" />
     <Folder Include="Views\Rules\" />
     <Folder Include="Views\GetStarted\" />
     <Folder Include="Views\ApiDoc\" />

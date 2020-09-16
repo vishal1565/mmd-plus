@@ -6,6 +6,8 @@ namespace DataAccess.Data.Abstract
 {
     public interface IUserRepository
     {
-        bool isEmailUniq(string email);
+        bool IsEmailUniq(string email);
+
+        bool IsEmailUniq(string email, string teamId);
     }
 }
