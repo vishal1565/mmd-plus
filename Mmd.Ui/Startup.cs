@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NotificationService;
+using SendGrid;
 
 namespace mmd_plus
 {
@@ -48,7 +49,7 @@ namespace mmd_plus
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IRegistrationService, RegistrationService>();
 
-            //services.AddScoped<INotificationService, EmailNotificationService>();
+            services.AddScoped<EmailNotificationService>();
 
             services.AddScoped<Func<string, INotificationService>>(ServiceProvider => key =>
             {
@@ -65,7 +66,7 @@ namespace mmd_plus
 
             if (!string.IsNullOrWhiteSpace(smtpHost))
             {
-                services.AddScoped<INotificationService,EmailNotificationService>();
+                //services.AddScoped<INotificationService,EmailNotificationService>();
                 var fromAddress = new MailAddress(Environment.GetEnvironmentVariable("FROM_ADDRESS"), "Meghraj@CodeComp");
                 var fromPassword = Environment.GetEnvironmentVariable("FROM_PASSWORD");
                 services.AddSingleton(factory =>
@@ -80,6 +81,12 @@ namespace mmd_plus
                     };
                 });
             }
+
+            var sendGridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+
+            services.AddSingleton(factory => {
+                return new SendGridClient(sendGridApiKey);
+            });
 
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? Configuration.GetConnectionString("CodeCompDatabase");
 
