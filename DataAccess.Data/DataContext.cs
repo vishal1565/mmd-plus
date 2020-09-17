@@ -9,7 +9,11 @@ namespace DataAccess.Data
 {
     public class DataContext : DbContext
     {
+        public DbSet<Game> Games { get; set; }
+        public DbSet<Phase> Phases { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Round> Rounds { get; set; }
+        public DbSet<RoundConfig> RoundConfigs { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -27,6 +31,43 @@ namespace DataAccess.Data
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Game>(entity => 
+            {
+                entity.Property(game => game.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(game => game.GameId);
+                
+                entity.Property(game => game.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+            });
+
+            modelBuilder.Entity<Phase>(entity => 
+            {
+                entity.Property(phase => phase.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(phase => new { phase.RoundId, phase.PhaseType });
+
+                entity.Property(phase => phase.GameId).IsRequired();
+                
+                entity.Property(phase => phase.RoundId).IsRequired();
+
+                entity.Property(phase => phase.PhaseType).HasConversion(
+                    type => type.ToString(), // code to db
+                    type => (PhaseType)Enum.Parse(typeof(PhaseType), type) // db to code
+                );
+
+                entity.Property(phase => phase.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+
+                entity.HasOne(phase => phase.Game)
+                    .WithMany(game => game.Phases)
+                    .HasForeignKey(phase => phase.GameId)
+                    .HasConstraintName("FK__Phase__Game");
+
+                entity.HasOne(phase => phase.Round)
+                    .WithMany(round => round.RoundPhases)
+                    .HasForeignKey(phase => phase.RoundId)
+                    .HasConstraintName("FK__Phase__Round");
+            });
+
             modelBuilder.Entity<Location>(entity =>
             {
                 entity.Property(loc => loc.LocationId)
@@ -38,6 +79,33 @@ namespace DataAccess.Data
                 entity.Property(loc => loc.DisplayName).IsRequired();
 
                 entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Round>(entity => 
+            {
+                entity.Property(round => round.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(round => round.RoundId);
+
+                entity.Property(round => round.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+
+                entity.Property(round => round.RoundNumber).IsRequired();
+
+                entity.HasOne(round => round.Game)
+                    .WithMany(game => game.Rounds)
+                    .HasForeignKey(round => round.GameId)
+                    .HasConstraintName("FK__Round__Game");
+            });
+
+            modelBuilder.Entity<RoundConfig>(entity => 
+            {
+                entity.HasKey(rc => rc.Id);
+                entity.Property(rc => rc.Id).HasColumnName("RoundNumber");
+                entity.Property(rc => rc.JoiningDuration).IsRequired();
+                entity.Property(rc => rc.RunningDuration).IsRequired();
+                entity.Property(rc => rc.FinishedDuration).IsRequired();
+                entity.Property(rc => rc.Penalty).IsRequired();
+                entity.Property(rc => rc.DefaultLives).IsRequired();
             });
 
             modelBuilder.Entity<Team>(entity =>
