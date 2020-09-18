@@ -17,6 +17,8 @@ namespace DataAccess.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
 
+        private const string TIMESTAMP_TYPE = "timestamp with time zone";
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,7 +39,54 @@ namespace DataAccess.Data
 
                 entity.HasKey(game => game.GameId);
                 
-                entity.Property(game => game.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+                entity.Property(game => game.TimeStamp).HasColumnType(TIMESTAMP_TYPE).IsRequired();
+            });
+
+            modelBuilder.Entity<Kill>(entity => 
+            {
+                entity.Property(kill => kill.Id).ValueGeneratedOnAdd();
+                
+                entity.HasKey(kill => new { kill.RoundId, kill.VictimId, kill.KillerId });
+
+                entity.Property(kill => kill.KillerId).IsRequired().HasMaxLength(20);
+
+                entity.Property(kill => kill.VictimId).IsRequired().HasMaxLength(20);
+
+                entity.Property(kill => kill.TimeStamp).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(kill => kill.Game)
+                    .WithMany(game => game.Kills)
+                    .HasForeignKey(kill => kill.GameId)
+                    .HasConstraintName("FK__Kill__Game");
+
+                entity.HasOne(kill => kill.Round)
+                    .WithMany(round => round.Kills)
+                    .HasForeignKey(kill => kill.RoundId)
+                    .HasConstraintName("FK__Kill__Round");
+                
+                entity.HasOne(kill => kill.Victim)
+                    .WithMany(team => team.DeathRecord)
+                    .HasForeignKey(kill => kill.VictimId)
+                    .HasConstraintName("FK__Kill__Victim");
+
+                entity.HasOne(kill => kill.Killer)
+                    .WithMany(team => team.KillRecord)
+                    .HasForeignKey(kill => kill.KillerId)
+                    .HasConstraintName("FK__Kill__Killer");
+
+            });
+
+            modelBuilder.Entity<Location>(entity =>
+            {
+                entity.Property(loc => loc.LocationId)
+                .HasMaxLength(20)
+                .IsRequired();
+
+                entity.HasKey(loc => loc.LocationId);
+
+                entity.Property(loc => loc.DisplayName).IsRequired();
+
+                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<Phase>(entity => 
@@ -55,7 +104,7 @@ namespace DataAccess.Data
                     type => (PhaseType)Enum.Parse(typeof(PhaseType), type) // db to code
                 );
 
-                entity.Property(phase => phase.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+                entity.Property(phase => phase.TimeStamp).HasColumnType(TIMESTAMP_TYPE).IsRequired();
 
                 entity.HasOne(phase => phase.Game)
                     .WithMany(game => game.Phases)
@@ -68,26 +117,13 @@ namespace DataAccess.Data
                     .HasConstraintName("FK__Phase__Round");
             });
 
-            modelBuilder.Entity<Location>(entity =>
-            {
-                entity.Property(loc => loc.LocationId)
-                .HasMaxLength(20)
-                .IsRequired();
-
-                entity.HasKey(loc => loc.LocationId);
-
-                entity.Property(loc => loc.DisplayName).IsRequired();
-
-                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
-            });
-
             modelBuilder.Entity<Round>(entity => 
             {
                 entity.Property(round => round.Id).ValueGeneratedOnAdd();
 
                 entity.HasKey(round => round.RoundId);
 
-                entity.Property(round => round.TimeStamp).HasColumnType("timestamp with time zone").IsRequired();
+                entity.Property(round => round.TimeStamp).HasColumnType(TIMESTAMP_TYPE).IsRequired();
 
                 entity.Property(round => round.RoundNumber).IsRequired();
 
@@ -105,7 +141,7 @@ namespace DataAccess.Data
                 entity.Property(rc => rc.RunningDuration).IsRequired();
                 entity.Property(rc => rc.FinishedDuration).IsRequired();
                 entity.Property(rc => rc.Penalty).IsRequired();
-                entity.Property(rc => rc.DefaultLives).IsRequired();
+                entity.Property(rc => rc.LifeLines).IsRequired();
             });
 
             modelBuilder.Entity<Team>(entity =>
@@ -116,9 +152,9 @@ namespace DataAccess.Data
 
                 entity.HasKey(team => team.TeamId);
 
-                entity.Property(team => team.RegisteredAt).HasColumnType("timestamp with time zone");
+                entity.Property(team => team.RegisteredAt).HasColumnType(TIMESTAMP_TYPE);
 
-                entity.Property(team => team.LastUpdatedAt).HasColumnType("timestamp with time zone");
+                entity.Property(team => team.LastUpdatedAt).HasColumnType(TIMESTAMP_TYPE);
 
                 entity.Property(team => team.SecretToken).IsRequired();
 
@@ -134,7 +170,7 @@ namespace DataAccess.Data
             {
                 entity.HasKey(user => user.UserId);
 
-                entity.Property(user => user.AddedAt).HasColumnType("timestamp with time zone");
+                entity.Property(user => user.AddedAt).HasColumnType(TIMESTAMP_TYPE);
 
                 entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
 

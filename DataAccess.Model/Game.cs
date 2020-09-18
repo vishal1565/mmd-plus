@@ -8,11 +8,13 @@ namespace DataAccess.Model
         {
             Rounds = new HashSet<Round>();
             Phases = new HashSet<Phase>();
+            Kills = new HashSet<Kill>();
         }
         public long Id {get; set;}
         public Guid GameId {get; set;}
         public DateTime TimeStamp {get; set;}
         public ICollection<Round> Rounds {get; set;}
         public ICollection<Phase> Phases {get; set;}
+        public ICollection<Kill> Kills { get; set; }
     }
 }
