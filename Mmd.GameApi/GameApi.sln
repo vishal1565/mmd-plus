@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApi.Service", "GameApi.Service\GameApi.Service.csproj", "{09AA7453-F057-42D1-944B-05830B218BC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApi.Tests", "GameApi.Tests\GameApi.Tests.csproj", "{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{09AA7453-F057-42D1-944B-05830B218BC7}.Release|x64.Build.0 = Release|Any CPU
 		{09AA7453-F057-42D1-944B-05830B218BC7}.Release|x86.ActiveCfg = Release|Any CPU
 		{09AA7453-F057-42D1-944B-05830B218BC7}.Release|x86.Build.0 = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|x64.Build.0 = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Debug|x86.Build.0 = Debug|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|x64.ActiveCfg = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|x64.Build.0 = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|x86.ActiveCfg = Release|Any CPU
+		{13991886-6FA3-4CC3-9B2B-8F7FA8D10E7C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

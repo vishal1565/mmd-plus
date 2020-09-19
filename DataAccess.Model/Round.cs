@@ -9,6 +9,11 @@ namespace DataAccess.Model
         {
             RoundPhases = new HashSet<Phase>();
             Kills = new HashSet<Kill>();
+            Participants = new HashSet<Participant>();
+
+            Guesses = new HashSet<Guess>();
+            Scores = new HashSet<Score>();
+            Requests = new HashSet<Request>();
         }
         public long Id {get; set;}
         public Guid GameId {get; set;}
@@ -18,5 +23,9 @@ namespace DataAccess.Model
         public Game Game { get; set; }
         public ICollection<Phase> RoundPhases {get; set;}
         public ICollection<Kill> Kills { get; set; }
+        public ICollection<Participant> Participants { get; set; }
+        public ICollection<Guess> Guesses { get; set; }
+        public ICollection<Score> Scores { get; set; }
+        public ICollection<Request> Requests { get; set; }
     }
 }

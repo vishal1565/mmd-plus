@@ -9,11 +9,17 @@ namespace DataAccess.Data
 {
     public class DataContext : DbContext
     {
+        public DbSet<FutureGame> FutureGames { get; set; }
         public DbSet<Game> Games { get; set; }
-        public DbSet<Phase> Phases { get; set; }
+        public DbSet<Guess> Guesses { get; set; }
+        public DbSet<Kill> Kills { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Participant> Participants { get; set; }
+        public DbSet<Phase> Phases { get; set; }
+        public DbSet<Request> Requests { get; set; }
         public DbSet<Round> Rounds { get; set; }
         public DbSet<RoundConfig> RoundConfigs { get; set; }
+        public DbSet<Score> Scores { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -33,6 +39,19 @@ namespace DataAccess.Data
 
         void ConfigureModelBuilderForUser(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FutureGame>(entity =>
+            {
+                entity.Property(fg => fg.Id).ValueGeneratedOnAdd();
+                
+                entity.HasKey(fg => fg.Id);
+                
+                entity.Property(fg => fg.StartTime).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.Property(fg => fg.RunOnce).IsRequired().HasDefaultValue(false);
+                
+                entity.Property(fg => fg.RunGamesTill).HasColumnType(TIMESTAMP_TYPE).HasDefaultValue(null);
+            });
+
             modelBuilder.Entity<Game>(entity => 
             {
                 entity.Property(game => game.Id).ValueGeneratedOnAdd();
@@ -40,6 +59,33 @@ namespace DataAccess.Data
                 entity.HasKey(game => game.GameId);
                 
                 entity.Property(game => game.TimeStamp).HasColumnType(TIMESTAMP_TYPE).IsRequired();
+            });
+
+            modelBuilder.Entity<Guess>(entity => 
+            {
+                entity.Property(guess => guess.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(guess => guess.GuessId);
+
+                entity.Property(guess => guess.GameId).IsRequired();
+                entity.Property(guess => guess.RoundId).IsRequired();
+                entity.Property(guess => guess.TeamId).IsRequired().HasMaxLength(20);
+                entity.Property(guess => guess.TimeStamp).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(d => d.Game)
+                    .WithMany(f => f.Guesses)
+                    .HasForeignKey(d => d.GameId)
+                    .HasConstraintName("FK__Guess__Game");
+
+                entity.HasOne(d => d.Round)
+                    .WithMany(f => f.Guesses)
+                    .HasForeignKey(d => d.RoundId)
+                    .HasConstraintName("FK__Guess__Round");
+                
+                entity.HasOne(d => d.Team)
+                    .WithMany(f => f.Guesses)
+                    .HasForeignKey(d => d.TeamId)
+                    .HasConstraintName("FK__Guess__Team");
             });
 
             modelBuilder.Entity<Kill>(entity => 
@@ -78,6 +124,8 @@ namespace DataAccess.Data
 
             modelBuilder.Entity<Location>(entity =>
             {
+                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
+             
                 entity.Property(loc => loc.LocationId)
                 .HasMaxLength(20)
                 .IsRequired();
@@ -85,8 +133,38 @@ namespace DataAccess.Data
                 entity.HasKey(loc => loc.LocationId);
 
                 entity.Property(loc => loc.DisplayName).IsRequired();
+            });
 
-                entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Participant>(entity => 
+            {
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(p => new { p.RoundId, p.TeamId });
+                
+                entity.Property(p => p.GameId).IsRequired();
+
+                entity.Property(p => p.RoundId).IsRequired();
+
+                entity.Property(p => p.TeamId).IsRequired().HasMaxLength(20);
+
+                entity.Property(p => p.IsAlive).IsRequired().HasDefaultValue(true);
+
+                entity.Property(guess => guess.JoinedAt).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(d => d.Game)
+                    .WithMany(f => f.Participants)
+                    .HasForeignKey(d => d.GameId)
+                    .HasConstraintName("FK__Part__Game");
+
+                entity.HasOne(d => d.Round)
+                    .WithMany(f => f.Participants)
+                    .HasForeignKey(d => d.RoundId)
+                    .HasConstraintName("FK__Part__Round");
+                
+                entity.HasOne(d => d.Team)
+                    .WithMany(f => f.ParticipationRecord)
+                    .HasForeignKey(d => d.TeamId)
+                    .HasConstraintName("FK__Part__Team");
             });
 
             modelBuilder.Entity<Phase>(entity => 
@@ -102,7 +180,7 @@ namespace DataAccess.Data
                 entity.Property(phase => phase.PhaseType).HasConversion(
                     type => type.ToString(), // code to db
                     type => (PhaseType)Enum.Parse(typeof(PhaseType), type) // db to code
-                );
+                ).IsRequired();
 
                 entity.Property(phase => phase.TimeStamp).HasColumnType(TIMESTAMP_TYPE).IsRequired();
 
@@ -115,6 +193,44 @@ namespace DataAccess.Data
                     .WithMany(round => round.RoundPhases)
                     .HasForeignKey(phase => phase.RoundId)
                     .HasConstraintName("FK__Phase__Round");
+            });
+
+            modelBuilder.Entity<Request>(entity => 
+            {
+                entity.Property(req => req.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(req => req.RequestId);
+
+                entity.Property(req => req.RequestApi).HasConversion(
+                    type => type.ToString(), // code to db
+                    type => (RequestApi)Enum.Parse(typeof(RequestApi), type) // db to code
+                ).IsRequired();
+
+                entity.Property(req => req.RequestMethod).HasConversion(
+                    type => type.ToString(), // code to db
+                    type => (RequestMethod)Enum.Parse(typeof(RequestMethod), type) // db to code
+                ).IsRequired();
+
+                entity.Property(req => req.GameId).HasDefaultValue(null);
+                entity.Property(req => req.RoundId).HasDefaultValue(null);
+                entity.Property(req => req.TeamId).HasDefaultValue(null);
+
+                entity.Property(guess => guess.TimeStamp).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(d => d.Game)
+                    .WithMany(f => f.Requests)
+                    .HasForeignKey(d => d.GameId)
+                    .HasConstraintName("FK__Req__Game");
+
+                entity.HasOne(d => d.Round)
+                    .WithMany(f => f.Requests)
+                    .HasForeignKey(d => d.RoundId)
+                    .HasConstraintName("FK__Req__Round");
+                
+                entity.HasOne(d => d.Team)
+                    .WithMany(f => f.Requests)
+                    .HasForeignKey(d => d.TeamId)
+                    .HasConstraintName("FK__Req__Team");
             });
 
             modelBuilder.Entity<Round>(entity => 
@@ -144,6 +260,43 @@ namespace DataAccess.Data
                 entity.Property(rc => rc.LifeLines).IsRequired();
             });
 
+            modelBuilder.Entity<Score>(entity => {
+
+                entity.Property(s => s.Id).ValueGeneratedOnAdd();
+
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.PointsScored).IsRequired().HasDefaultValue(0);
+
+                entity.Property(s => s.GameId).IsRequired();
+
+                entity.Property(s => s.RoundId).IsRequired();
+
+                entity.Property(s => s.TeamId).IsRequired();
+
+                entity.Property(guess => guess.TimeStamp).IsRequired().HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(d => d.Game)
+                    .WithMany(f => f.Scores)
+                    .HasForeignKey(d => d.GameId)
+                    .HasConstraintName("FK__Score__Game");
+
+                entity.HasOne(d => d.Round)
+                    .WithMany(f => f.Scores)
+                    .HasForeignKey(d => d.RoundId)
+                    .HasConstraintName("FK__Score__Round");
+                
+                entity.HasOne(d => d.Team)
+                    .WithMany(f => f.Scores)
+                    .HasForeignKey(d => d.TeamId)
+                    .HasConstraintName("FK__Score__Team");
+
+                entity.HasOne(d => d.Guess)
+                    .WithOne(f => f.Score)
+                    .HasForeignKey<Score>(d => d.GuessId)
+                    .HasConstraintName("FK__Score__Guess");
+            });
+
             modelBuilder.Entity<Team>(entity =>
             {
                 entity.Property(team => team.TeamId)
@@ -155,6 +308,8 @@ namespace DataAccess.Data
                 entity.Property(team => team.RegisteredAt).HasColumnType(TIMESTAMP_TYPE);
 
                 entity.Property(team => team.LastUpdatedAt).HasColumnType(TIMESTAMP_TYPE);
+
+                entity.Property(team => team.IsRobot).HasDefaultValue(false);
 
                 entity.Property(team => team.SecretToken).IsRequired();
 
