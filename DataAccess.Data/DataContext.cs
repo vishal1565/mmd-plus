@@ -72,6 +72,9 @@ namespace DataAccess.Data
                 entity.Property(guess => guess.TeamId).IsRequired().HasMaxLength(20);
                 entity.Property(guess => guess.TimeStamp).IsRequired().HasColumnType(TIMESTAMP_TYPE);
 
+                entity.Property(guess => guess.GuessRequest).HasColumnType("jsonb");
+                entity.Property(guess => guess.GuessResponse).HasColumnType("jsonb");
+
                 entity.HasOne(d => d.Game)
                     .WithMany(f => f.Guesses)
                     .HasForeignKey(d => d.GameId)
