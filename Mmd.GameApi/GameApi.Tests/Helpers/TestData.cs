@@ -4,7 +4,7 @@ using System.Linq;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
 
-namespace GameApi.Tests
+namespace GameApi.Tests.Helpers
 {
     public class TestData
     {
