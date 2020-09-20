@@ -7,6 +7,8 @@ namespace GameApi.Service.Controllers
     [Route("/api/[controller]")]
     public class GameStatusController : ControllerBase
     {
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
         public ActionResult<GameStatusResponse> Index()
         {
             return new GameStatusResponse();
