@@ -9,20 +9,24 @@ namespace DataAccess.Data
 {
     public class DataContext : DbContext
     {
-        public DbSet<FutureGame> FutureGames { get; set; }
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Guess> Guesses { get; set; }
-        public DbSet<Kill> Kills { get; set; }
-        public DbSet<Location> Locations { get; set; }
-        public DbSet<Participant> Participants { get; set; }
-        public DbSet<Phase> Phases { get; set; }
-        public DbSet<Request> Requests { get; set; }
-        public DbSet<Round> Rounds { get; set; }
-        public DbSet<RoundConfig> RoundConfigs { get; set; }
-        public DbSet<Score> Scores { get; set; }
-        public DbSet<Team> Teams { get; set; }
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<FutureGame> FutureGames { get; set; }
+        public virtual DbSet<Game> Games { get; set; }
+        public virtual DbSet<Guess> Guesses { get; set; }
+        public virtual DbSet<Kill> Kills { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<Participant> Participants { get; set; }
+        public virtual DbSet<Phase> Phases { get; set; }
+        public virtual DbSet<Request> Requests { get; set; }
+        public virtual DbSet<Round> Rounds { get; set; }
+        public virtual DbSet<RoundConfig> RoundConfigs { get; set; }
+        public virtual DbSet<Score> Scores { get; set; }
+        public virtual DbSet<Team> Teams { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
+        public DataContext()
+        {
+
+        }
         private const string TIMESTAMP_TYPE = "timestamp with time zone";
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
