@@ -18,9 +18,9 @@ namespace Mmd.GameController
         private string currentState;
         private readonly ILogger<GameInstance> _logger;
         private readonly IGameControllerService _svc;
-        private Timer _timer;
+        //private Timer _timer;
         private IOptions<AppSettings> _config;
-        private long _previousRoundId;
+        //private long _previousRoundId;
 
         public GameInstance(ILogger<GameInstance> logger, IGameControllerService svc, IOptions<AppSettings> config)
         {

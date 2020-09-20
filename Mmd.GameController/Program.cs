@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using DataAccess.Data;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,8 +69,13 @@ namespace Mmd.GameController
 
                 serviceCollection.AddScoped<IGameControllerService, GameControllerService>();
 
-                //var conString = Environment.GetEnvironmentVariable("CodeCompDataBaseConnection") ?? configuration["ConnectionStrings:DefaultConnection"];
-                //serviceCollection.AddDbContext<CodeCompContext>(options => options.UseSqlServer(conString));
+ 
+                string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION") ?? configuration.GetConnectionString("CodeCompDatabase");
+
+                serviceCollection.AddDbContext<DataContext>(options =>
+                {
+                    options.UseNpgsql(connectionString);
+                });
 
                 serviceCollection.AddHostedService<App>();
 
