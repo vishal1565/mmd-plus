@@ -4,24 +4,13 @@ using DataAccess.Model;
 
 namespace GameApi.Service.Models
 {
-    public class GameStatusResponse
+    public class GameStatusResponse : ApiResponse
     {
-        public Error Err { get; set; }
-        public Data Data { get; set; }
+        public new GameStatusData Data { get; set; }
     }
 
-    public class Error
+    public class GameStatusData : ApiResponseData
     {
-        public string Message { get; set; }
-        public string Description { get; set; }
-    }
-
-    public class Data
-    {
-        public Guid GameId { get; set; }
-        public Guid RoundId { get; set; }
-        public PhaseType RoundPhase { get; set; }
-        public int RoundNumber { get; set; }
         public int SecretLength { get; set; }
         public List<TeamData> Participants { get; set; }
 

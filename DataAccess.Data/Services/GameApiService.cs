@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DataAccess.Data.Abstract;
 using DataAccess.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data.Services
 {
-    public class GameApiService
+    public class GameApiService : IGameApiService
     {
         private readonly DataContext _context;
 
@@ -15,9 +16,9 @@ namespace DataAccess.Data.Services
             _context = context;
         }
 
-        public async Task<List<Team>> GetAllTeamAsync()
+        public object GetCurrentStatus()
         {
-            return await _context.Teams.ToListAsync();
+            throw new NotImplementedException();
         }
     }
 }
