@@ -2,8 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccess.Data.Abstract;
+using DataAccess.Data.Services;
+using GameApi.Service.Handlers;
+using GameApi.Service.Models;
+using GameApi.Service.Providers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +32,14 @@ namespace GameApi.Service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication()
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
+            services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IAuthenticationSchemeProvider, CustomAuthenticationSchemeProvider>();
+            services.AddLogging(cfg => cfg.AddConsole()).Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Warning);
+            services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<IGameApiService, GameApiService>();
+            services.AddScoped<RequestContext>();
             services.AddControllers();
         }
 

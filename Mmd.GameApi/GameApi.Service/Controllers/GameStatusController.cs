@@ -11,15 +11,17 @@ namespace GameApi.Service.Controllers
     public class GameStatusController : ControllerBase
     {
         private readonly IGameApiService _service;
+        private readonly RequestContext _requestContext;
 
-        public GameStatusController(IGameApiService service)
+        public GameStatusController(IGameApiService service, RequestContext requestContext)
         {
             _service = service ?? throw new ArgumentNullException("IGameApiService");
+            _requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
         }
         public async Task<ActionResult<GameStatusResponse>> Index()
         {
             var response = new GameStatusResponse();
-            response.RequestId = Guid.NewGuid();
+            response.RequestId = _requestContext.RequestId;
             //var currentStatus = _service.GetCurrentStatus();
             return Ok(response);
         }
