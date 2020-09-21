@@ -33,7 +33,8 @@ namespace GameApi.Tests
             dbContext.SetupGet(x => x.Requests).Returns(TestFunctions.GetDbSet<Request>(TestData.Requests).Object);
 
             _service = new Mock<GameApiService>(dbContext.Object){ CallBase = true };
-            _controller = new Mock<GameStatusController>(_service.Object){ CallBase = true }.Object;
+            var requestContext = new RequestContext();
+            _controller = new Mock<GameStatusController>(_service.Object, requestContext){ CallBase = true }.Object;
         }
 
         // It should be an async function call for Index() method
