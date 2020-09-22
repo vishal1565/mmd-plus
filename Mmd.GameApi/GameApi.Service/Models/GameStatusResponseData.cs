@@ -7,8 +7,13 @@ namespace GameApi.Service.Models
 {
     public class GameStatusResponseData : ApiResponseData
     {
+        public GameStatusResponseData()
+        {
+            SecretLength = null;
+        }
+
         [JsonProperty(Order = 5)]
-        public int SecretLength { get; set; }
+        public int? SecretLength { get; set; }
         [JsonProperty(Order = 6)]
         public List<TeamData> Participants { get; set; }
 

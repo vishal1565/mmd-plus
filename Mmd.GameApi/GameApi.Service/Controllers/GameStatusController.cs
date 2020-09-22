@@ -26,8 +26,6 @@ namespace GameApi.Service.Controllers
             var response = new GameStatusResponse();
             response.RequestId = requestContext.RequestId;
             response.Data = new GameStatusResponseData();
-            response.Data.GameId = null;
-            response.Data.RoundId = null;
             return Json(response);
         }
     }

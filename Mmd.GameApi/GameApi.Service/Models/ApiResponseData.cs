@@ -6,13 +6,20 @@ namespace GameApi.Service.Models
 {
     public abstract class ApiResponseData
     {
+        public ApiResponseData()
+        {
+            GameId = null;
+            RoundId = null;
+            RoundNumber = null;
+            Status = null;
+        }
         [JsonProperty(Order = 1)]
         public Guid? GameId { get; set; }
         [JsonProperty(Order = 2)]
         public Guid? RoundId { get; set; }
         [JsonProperty(Order = 3)]
-        public int RoundNumber { get; set; }
+        public int? RoundNumber { get; set; }
         [JsonProperty(Order = 4)]
-        public PhaseType Status { get; set; }
+        public PhaseType? Status { get; set; }
     }
 }
