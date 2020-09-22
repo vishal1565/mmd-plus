@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using GameApi.Service.Controllers;
 using GameApi.Service.Models;
+using GameApi.Tests.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -21,15 +22,21 @@ namespace GameApi.Tests
         }
 
         [Fact]
-        public void HaveAHttpGetMethod()
+        public void HaveAnApiControllerAttribute()
+        {
+            Attribute.GetCustomAttributes(typeof(GameStatusController), typeof(ApiControllerAttribute)).Any().Should().BeTrue();
+        }
+
+        [Fact]
+        public void HaveAnHttpGetMethod()
         {
             var controller = new GameStatusController();
-            var hasAHttpGetMethod = MethodHasAttribute(() => controller.Get(), typeof( HttpGetAttribute));
+            var hasAHttpGetMethod = TestFunctions.MethodHasAttribute(() => controller.Get(), typeof( HttpGetAttribute));
             hasAHttpGetMethod.Should().BeTrue();
         }
 
         [Fact]
-        public async void ShouldReturnGameStatusResponse()
+        public async void ReturnGameStatusResponse()
         {
             var controller = new GameStatusController();
             var response = await controller.Get();
@@ -39,27 +46,13 @@ namespace GameApi.Tests
         }
 
         [Fact]
-        public async void ShouldHaveAValidRequestId()
+        public async void HaveAValidRequestId()
         {
             var controller = new GameStatusController();
             var response = await controller.Get();
             var result = (OkObjectResult)response.Result;
             result.Value.Should().BeAssignableTo<GameStatusResponse>();
             ((GameStatusResponse)result.Value).RequestId.Should().NotBe(new Guid());
-        }
-
-        public static MethodInfo MethodOf( Expression<System.Action> expression )
-        {
-            MethodCallExpression body = (MethodCallExpression)expression.Body;
-            return body.Method;
-        }
-
-        public static bool MethodHasAttribute( Expression<System.Action> expression , Type attributeType)
-        {
-            var methodInfo = MethodOf( expression );
-
-            const bool includeInherited = false;
-            return methodInfo.GetCustomAttributes( attributeType, includeInherited ).Any();
         }
     }
 }

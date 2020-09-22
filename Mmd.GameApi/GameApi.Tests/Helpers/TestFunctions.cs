@@ -5,6 +5,8 @@ using System.Linq;
 using GameApi.Tests.Helpers.TestClasses;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System.Reflection;
+using System.Linq.Expressions;
 
 namespace GameApi.Tests.Helpers
 {
@@ -22,6 +24,20 @@ namespace GameApi.Tests.Helpers
             MockSet.As<IQueryable<T>>().Setup(x => x.ElementType).Returns(TestData.ElementType);
             MockSet.As<IQueryable<T>>().Setup(x => x.GetEnumerator()).Returns(TestData.GetEnumerator());
             return MockSet;
+        }
+
+        public static MethodInfo MethodOf(Expression<System.Action> expression)
+        {
+            MethodCallExpression body = (MethodCallExpression)expression.Body;
+            return body.Method;
+        }
+
+        public static bool MethodHasAttribute(Expression<System.Action> expression, Type attributeType)
+        {
+            var methodInfo = MethodOf(expression);
+
+            const bool includeInherited = false;
+            return methodInfo.GetCustomAttributes(attributeType, includeInherited).Any();
         }
 
     }

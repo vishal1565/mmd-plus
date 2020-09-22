@@ -6,7 +6,7 @@ namespace GameApi.Service.Models
 {
     public class GameStatusResponse : ApiResponse
     {
-        public new GameStatusData Data { get; set; }
+        public GameStatusData Data { get; set; }
     }
 
     public class GameStatusData : ApiResponseData

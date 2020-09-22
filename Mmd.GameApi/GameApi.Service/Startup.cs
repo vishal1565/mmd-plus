@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccess.Data;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
 using GameApi.Service.Handlers;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,13 +36,18 @@ namespace GameApi.Service
         {
             services.AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
-            services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
             services.AddScoped<IAuthenticationSchemeProvider, CustomAuthenticationSchemeProvider>();
             services.AddLogging(cfg => cfg.AddConsole()).Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Warning);
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<IGameApiService, GameApiService>();
             services.AddScoped<RequestContext>();
             services.AddControllers();
+            string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+            services.AddDbContextPool<DataContext>(options =>
+            {
+                options.UseNpgsql(connectionString);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

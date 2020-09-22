@@ -7,6 +7,6 @@ namespace GameApi.Service.Models
     {
         public Guid RequestId { get; set; }
         public Error Err { get; set; }
-        public virtual ApiResponseData Data { get; set; }
+        public abstract ApiResponseData Data { get; set; }
     }
 }
