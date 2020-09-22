@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 
 namespace DataAccess.Model
 {
@@ -11,6 +12,7 @@ namespace DataAccess.Model
         public string TeamId { get; set; }
         public RequestMethod RequestMethod { get; set; }
         public RequestApi RequestApi { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
         public DateTime TimeStamp { get; set; }
         public Game Game { get; set; }
         public Round Round { get; set; }

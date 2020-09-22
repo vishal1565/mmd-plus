@@ -218,6 +218,8 @@ namespace DataAccess.Data
                     type => (RequestMethod)Enum.Parse(typeof(RequestMethod), type) // db to code
                 ).IsRequired();
 
+                entity.Property(req => req.StatusCode).IsRequired();
+
                 entity.Property(req => req.GameId).HasDefaultValue(null);
                 entity.Property(req => req.RoundId).HasDefaultValue(null);
                 entity.Property(req => req.TeamId).HasDefaultValue(null);

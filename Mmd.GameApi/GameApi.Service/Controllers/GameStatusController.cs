@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
+using DataAccess.Model.SharedModels;
 using GameApi.Service.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace GameApi.Service.Controllers
 {
@@ -13,6 +15,7 @@ namespace GameApi.Service.Controllers
     {
         private readonly RequestContext requestContext;
         private readonly IGameApiService gameApiService;
+        private readonly ILogger<GameStatusController> logger;
 
         public GameStatusController(RequestContext requestContext, IGameApiService gameApiService)
         {
@@ -21,12 +24,29 @@ namespace GameApi.Service.Controllers
         }
 
         [HttpGet]
-        public virtual async Task<ActionResult<GameStatusResponse>> Get()
+        public async Task<ActionResult<GameStatusResponse>> Get()
         {
-            var response = new GameStatusResponse();
-            response.RequestId = requestContext.RequestId;
-            response.Data = new GameStatusResponseData();
-            return Json(response);
+            JsonResult response = null;
+            try
+            {
+                throw new NotImplementedException();
+            }
+            catch(Exception ex)
+            {
+                if (logger != null)
+                    logger.LogError($"Error Occurred while fetching current gamestatus, {ex}");
+
+                response = new JsonResult(new GameStatusResponse { 
+                    RequestId = requestContext.RequestId,
+                    Err = new Error { 
+                        Message = "Internal Server Error",
+                        Description = "Server Failed to fetch Current Gamestatus"
+                    }
+                });
+
+                response.StatusCode = 500;
+            }
+            return response;
         }
     }
 }

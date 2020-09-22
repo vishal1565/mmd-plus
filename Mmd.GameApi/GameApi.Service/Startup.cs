@@ -44,7 +44,7 @@ namespace GameApi.Service
             services.AddScoped<RequestContext>();
             services.AddControllers().AddNewtonsoftJson();
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
-            services.AddDbContextPool<DataContext>(options =>
+            services.AddDbContext<DataContext>(options =>
             {
                 options.UseNpgsql(connectionString);
             });
