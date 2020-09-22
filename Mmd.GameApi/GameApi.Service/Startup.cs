@@ -42,7 +42,7 @@ namespace GameApi.Service
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<IGameApiService, GameApiService>();
             services.AddScoped<RequestContext>();
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContextPool<DataContext>(options =>
             {

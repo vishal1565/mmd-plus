@@ -6,8 +6,11 @@ namespace GameApi.Service.Models
 {
     public abstract class ApiResponse<T> where T : ApiResponseData
     {
+        [JsonProperty(Order = 1)]
         public Guid RequestId { get; set; }
+        [JsonProperty(Order = 2)]
         public Error Err { get; set; }
+        [JsonProperty(Order = 3)]
         public abstract T Data { get; set; }
     }
 

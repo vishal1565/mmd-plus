@@ -1,10 +1,16 @@
+using Newtonsoft.Json;
+
 namespace GameApi.Service.Models
 {
     public class TeamData
     {
+        [JsonProperty(Order = 1)]
         public string TeamId { get; set; }
+        [JsonProperty(Order = 2)]
         public long CurrentScore { get; set; }
+        [JsonProperty(Order = 3)]
         public long TotalScore { get; set; }
+        [JsonProperty(Order = 4)]
         public bool IsAlive { get; set; }
     }
 }
