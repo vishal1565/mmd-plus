@@ -57,7 +57,6 @@ namespace GameApi.Tests
 
             Assert.NotNull(result.Result);
             var gameStatus = (GameStatusResponse)((OkObjectResult)result.Result).Value;
-            Assert.NotNull(gameStatus.RequestId);
             Assert.NotEqual(new Guid().ToString(), gameStatus.RequestId.ToString());
         }
 
