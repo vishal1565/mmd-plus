@@ -14,14 +14,14 @@ namespace GameApi.Service.Controllers
         private readonly RequestContext requestContext;
         private readonly IGameApiService gameApiService;
 
-        public GameStatusController(RequestContext requestContext)
+        public GameStatusController(RequestContext requestContext, IGameApiService gameApiService)
         {
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
-            //this.gameApiService = gameApiService ?? throw new ArgumentNullException("IGameApiService");
+            this.gameApiService = gameApiService ?? throw new ArgumentNullException("IGameApiService");
         }
 
         [HttpGet]
-        public async Task<ActionResult<GameStatusResponse>> Get()
+        public virtual async Task<ActionResult<GameStatusResponse>> Get()
         {
             var response = new GameStatusResponse();
             response.RequestId = requestContext.RequestId;

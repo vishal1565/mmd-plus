@@ -78,7 +78,7 @@ namespace GameApi.Tests
             var result = (ActionResult<GameStatusResponse>)response.Result;
             var resultValue = ((JsonResult)result.Result).Value;
             resultValue.Should().BeAssignableTo<GameStatusResponse>();
-            ((GameStatusResponse)resultValue).RequestId.Should().NotBe(new Guid());
+            ((GameStatusResponse)resultValue).RequestId.Should().NotBe(Guid.Empty);
         }
 
         // GameStatusControllerResponseTests
