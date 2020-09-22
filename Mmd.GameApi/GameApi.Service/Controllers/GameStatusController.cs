@@ -14,6 +14,7 @@ namespace GameApi.Service.Controllers
         {
             var response = new GameStatusResponse();
             response.RequestId = Guid.NewGuid();
+            response.Data = new GameStatusResponseData();
             return Ok(response);
         }
     }

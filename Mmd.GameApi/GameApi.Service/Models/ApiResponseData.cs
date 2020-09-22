@@ -9,6 +9,5 @@ namespace GameApi.Service.Models
         public Guid RoundId { get; set; }
         public int RoundNumber { get; set; }
         public PhaseType RoundPhase { get; set; }
-
     }
 }

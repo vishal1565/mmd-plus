@@ -42,7 +42,7 @@ namespace GameApi.Tests
             var response = await controller.Get();
             var result = (OkObjectResult)response.Result;
             result.Should().NotBeNull();
-            result.Value.Should().BeAssignableTo<GameStatusResponse>();
+            result.Value.Should().BeAssignableTo<GameStatusResponseData>();
         }
 
         [Fact]
