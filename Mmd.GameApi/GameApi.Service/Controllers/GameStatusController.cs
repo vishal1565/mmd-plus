@@ -37,23 +37,27 @@ namespace GameApi.Service.Controllers
 
                 gameStatus.RequestId = requestContext.RequestId;
 
-                response = new JsonResult(gameStatus);
-
-                response.StatusCode = 200;
+                response = new JsonResult(gameStatus)
+                {
+                    StatusCode = 200
+                };
             }
             catch(Exception)
             {
                 logger.LogError($"Error Occurred while fetching current gamestatus");
 
-                response = new JsonResult(new GameStatusResponse { 
+                response = new JsonResult(new GameStatusResponse
+                {
                     RequestId = requestContext.RequestId,
-                    Err = new Error { 
+                    Err = new Error
+                    {
                         Message = "Internal Server Error",
                         Description = "Server Failed to fetch Current Gamestatus"
                     }
-                });
-
-                response.StatusCode = 500;
+                })
+                {
+                    StatusCode = 500
+                };
             }
 
             try

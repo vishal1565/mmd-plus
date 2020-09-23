@@ -20,6 +20,6 @@ namespace DataAccess.Model.SharedModels
         [JsonProperty(Order = 3)]
         public int? RoundNumber { get; set; }
         [JsonProperty(Order = 4)]
-        public PhaseType? Status { get; set; }
+        public string Status { get; set; }
     }
 }
