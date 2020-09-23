@@ -4,14 +4,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
 using DataAccess.Data;
 using DataAccess.Data.Services;
 using DataAccess.Model;
+using DataAccess.Model.SharedModels;
 using FluentAssertions;
 using GameApi.Service.Controllers;
-using GameApi.Service.Models;
 using GameApi.Tests.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -19,13 +21,20 @@ namespace GameApi.Tests
 {
     public class GameStatusControllerShould
     {
-        [Fact]
-        public void BeAControllerBase()
+        private readonly GameStatusController controller;
+
+        public GameStatusControllerShould()
         {
             var dataContext = new Mock<DataContext>();
             var gameApiService = new Mock<GameApiService>(dataContext.Object);
             var requestContext = new RequestContext();
-            var controller = new GameStatusController(requestContext, gameApiService.Object);
+            var requestLoggingService = new RequestLoggingService(requestContext);
+            var logger = Mock.Of<ILogger<GameStatusController>>();
+            controller = new GameStatusController(requestContext, gameApiService.Object, requestLoggingService, logger);
+        }
+        [Fact]
+        public void BeAControllerBase()
+        {
             Assert.IsAssignableFrom<ControllerBase>(controller);
         }
 
@@ -46,56 +55,30 @@ namespace GameApi.Tests
         [Fact]
         public void HaveAnHttpGetMethod()
         {
-            var dataContext = new Mock<DataContext>();
-            var gameApiService = new Mock<GameApiService>(dataContext.Object);
-            var requestContext = new RequestContext();
-            var controller = new GameStatusController(requestContext, gameApiService.Object);
             var hasAHttpGetMethod = TestFunctions.MethodHasAttribute(() => controller.Get(), typeof( HttpGetAttribute));
             hasAHttpGetMethod.Should().BeTrue();
         }
 
         [Fact]
-        public async void ReturnGameStatusResponse()
+        public async Task ReturnGameStatusResponse()
         {
-            var dataContext = new Mock<DataContext>();     
-            var gameApiService = new Mock<GameApiService>(dataContext.Object);
-            var requestContext = new RequestContext();
-            var controller = new GameStatusController(requestContext, gameApiService.Object);
             var response = await controller.Get();
-            var result = (ActionResult<GameStatusResponse>)response.Result;
-            var resultValue = ((JsonResult)result.Result).Value;
-            resultValue.Should().BeAssignableTo<GameStatusResponse>();
+            var result = response.Value;
+            result.Should().BeAssignableTo<GameStatusResponse>();
         }
 
         [Fact]
-        public async void HaveAValidRequestId()
+        public async Task HaveAValidRequestId()
         {
-            var dataContext = new Mock<DataContext>();
-            var gameApiService = new Mock<GameApiService>(dataContext.Object);
-            var requestContext = new RequestContext();
-            var controller = new GameStatusController(requestContext, gameApiService.Object);
             var response = await controller.Get();
-            var result = (ActionResult<GameStatusResponse>)response.Result;
-            var resultValue = ((JsonResult)result.Result).Value;
-            resultValue.Should().BeAssignableTo<GameStatusResponse>();
-            ((GameStatusResponse)resultValue).RequestId.Should().NotBe(Guid.Empty);
+            var result = response.Value;
+            result.Should().BeAssignableTo<GameStatusResponse>();
+            ((GameStatusResponse)result).RequestId.Should().NotBe(Guid.Empty);
         }
 
         // GameStatusControllerResponseTests
         
         // 1. If no current game is found, return errorGame is not running, 200
-        [Fact]
-        public async void ReturnGameNotRunning_GivenNoCurrentGameIsFound()
-        {
-            var dataContext = new Mock<DataContext>();
-            dataContext.SetupGet(x => x.Phases).Returns(TestFunctions.GetDbSet(new List<Phase>().AsQueryable()).Object);
-            var gameApiService = new Mock<GameApiService>(dataContext.Object);
-            var requestContext = new RequestContext();
-            var controller = new GameStatusController(requestContext, gameApiService.Object);
-            var response = await controller.Get();
-            var result = response.Result;
-        }
-
         // 2. If current game is there, but no current phase is found, return error try after some time, 200
         // 3. If any exception occurs while getting gamestatus, return error Internal Server Error, 500
         // Note: GameId and RoundId should be null and not new Guid() in all above cases.

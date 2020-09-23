@@ -1,6 +1,4 @@
-﻿using GameApi.Service.Models;
-
-namespace GameApi.Service
+﻿namespace DataAccess.Model.SharedModels
 {
     public class JoinResponseData : ApiResponseData
     {

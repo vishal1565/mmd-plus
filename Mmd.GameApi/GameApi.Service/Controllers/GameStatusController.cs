@@ -1,8 +1,9 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
+using DataAccess.Model;
 using DataAccess.Model.SharedModels;
-using GameApi.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -16,25 +17,33 @@ namespace GameApi.Service.Controllers
         private readonly RequestContext requestContext;
         private readonly IGameApiService gameApiService;
         private readonly ILogger<GameStatusController> logger;
+        private readonly IRequestLoggingService requestLoggingService;
 
-        public GameStatusController(RequestContext requestContext, IGameApiService gameApiService)
+        public GameStatusController(RequestContext requestContext, IGameApiService gameApiService, IRequestLoggingService requestLoggingService, ILogger<GameStatusController> logger)
         {
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
             this.gameApiService = gameApiService ?? throw new ArgumentNullException("IGameApiService");
+            this.requestLoggingService = requestLoggingService ?? throw new ArgumentNullException("IRequestLoggingService");
+            this.logger = logger ?? throw new ArgumentNullException("ILogger");
         }
 
         [HttpGet]
-        public async Task<ActionResult<GameStatusResponse>> Get()
+        public async Task<JsonResult> Get()
         {
-            JsonResult response = null;
+            JsonResult response;
             try
             {
-                throw new NotImplementedException();
+                GameStatusResponse gameStatus = await gameApiService.GetCurrentStatus();
+
+                gameStatus.RequestId = requestContext.RequestId;
+
+                response = new JsonResult(gameStatus);
+
+                response.StatusCode = 200;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                if (logger != null)
-                    logger.LogError($"Error Occurred while fetching current gamestatus, {ex}");
+                logger.LogError($"Error Occurred while fetching current gamestatus");
 
                 response = new JsonResult(new GameStatusResponse { 
                     RequestId = requestContext.RequestId,
@@ -46,6 +55,16 @@ namespace GameApi.Service.Controllers
 
                 response.StatusCode = 500;
             }
+
+            try
+            {
+                await requestLoggingService.RecordRequest(RequestMethod.GET, response.StatusCode, RequestApi.Gamestatus);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError($"Failed to record request to database, {ex}");
+            }
+
             return response;
         }
     }

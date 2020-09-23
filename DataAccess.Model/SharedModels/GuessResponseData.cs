@@ -1,7 +1,6 @@
-﻿using GameApi.Service.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace GameApi.Service
+namespace DataAccess.Model.SharedModels
 {
     public class GuessResponseData : ApiResponseData
     {

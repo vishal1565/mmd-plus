@@ -48,7 +48,7 @@ namespace GameApi.Service.Handlers
                     username = username.ToLowerInvariant();
                 var secretToken = credentials[1];
 
-                auth = _securityService.AuthenticateTeam(username, secretToken);
+                auth = await _securityService.AuthenticateTeam(username, secretToken);
 
                 if(auth)
                 {

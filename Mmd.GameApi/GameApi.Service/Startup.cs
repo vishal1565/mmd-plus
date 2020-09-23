@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using DataAccess.Data;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
+using DataAccess.Model.SharedModels;
 using GameApi.Service.Handlers;
-using GameApi.Service.Models;
 using GameApi.Service.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -41,6 +41,7 @@ namespace GameApi.Service
             services.AddLogging(cfg => cfg.AddConsole()).Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Warning);
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<IGameApiService, GameApiService>();
+            services.AddScoped<IRequestLoggingService, RequestLoggingService>();
             services.AddScoped<RequestContext>();
             services.AddControllers().AddNewtonsoftJson();
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");

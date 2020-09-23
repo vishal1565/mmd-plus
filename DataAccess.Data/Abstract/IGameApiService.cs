@@ -1,9 +1,11 @@
+using DataAccess.Model.SharedModels;
 using System;
+using System.Threading.Tasks;
 
 namespace DataAccess.Data.Abstract
 {
     public interface IGameApiService
     {
-        public object GetCurrentStatus();
+        public Task<GameStatusResponse> GetCurrentStatus();
     }
 }

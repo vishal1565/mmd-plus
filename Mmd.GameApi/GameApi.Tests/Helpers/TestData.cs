@@ -31,8 +31,8 @@ namespace GameApi.Tests.Helpers
             {
                 return new List<Guess>
                 {
-                    new Guess { Id = 1, GuessId = Guess1Id, GameId = GameId, RoundId = Round1Id, GuessRequest = new GuessRequest(), GuessResponse = new GuessResponse(), TimeStamp = DateTime.UtcNow, TeamId = "TestTeam1" },
-                    new Guess { Id = 1, GuessId = Guess2Id, GameId = GameId, RoundId = Round1Id, GuessRequest = new GuessRequest(), GuessResponse = new GuessResponse(), TimeStamp = DateTime.UtcNow, TeamId = "TestTeam1" }
+                    new Guess { Id = 1, GuessId = Guess1Id, GameId = GameId, RoundId = Round1Id, GuessRequest = new GuessRequestBody(), GuessResponse = new GuessResponseBody(), TimeStamp = DateTime.UtcNow, TeamId = "TestTeam1" },
+                    new Guess { Id = 1, GuessId = Guess2Id, GameId = GameId, RoundId = Round1Id, GuessRequest = new GuessRequestBody(), GuessResponse = new GuessResponseBody(), TimeStamp = DateTime.UtcNow, TeamId = "TestTeam1" }
                 }
                 .AsQueryable();
             }

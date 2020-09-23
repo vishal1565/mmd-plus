@@ -73,10 +73,10 @@ namespace DataAccess.Data.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uuid");
 
-                    b.Property<GuessRequest>("GuessRequest")
+                    b.Property<GuessRequestBody>("GuessRequest")
                         .HasColumnType("jsonb");
 
-                    b.Property<GuessResponse>("GuessResponse")
+                    b.Property<GuessResponseBody>("GuessResponse")
                         .HasColumnType("jsonb");
 
                     b.Property<long>("Id")

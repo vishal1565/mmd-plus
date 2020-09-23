@@ -1,6 +1,6 @@
 namespace DataAccess.Model.SharedModels
 {
-    public class GuessResponse
+    public class GuessResponseBody
     {
         
     }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace GameApi.Service.Models
+namespace DataAccess.Model.SharedModels
 {
     public class TeamData
     {

@@ -1,8 +1,7 @@
 using System;
-using DataAccess.Model.SharedModels;
 using Newtonsoft.Json;
 
-namespace GameApi.Service.Models
+namespace DataAccess.Model.SharedModels
 {
     public abstract class ApiResponse<T> where T : ApiResponseData
     {
