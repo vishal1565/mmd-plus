@@ -102,7 +102,7 @@ namespace DataAccess.Data.Services
         public void CollectPenalty(RoundConfig roundConfig)
         {
             //collect penalty from participants
-            Console.WriteLine("penalty collected");
+            //Console.WriteLine("penalty collected");
 
 
         }
