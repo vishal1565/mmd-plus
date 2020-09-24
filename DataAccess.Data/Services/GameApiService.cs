@@ -98,5 +98,88 @@ namespace DataAccess.Data.Services
                 throw new ServerSideException("Failed in GetCurrentStatus()", ex);
             }
         }
+
+        public virtual async Task<JoinResponse> JoinCurrentRound(string teamId)
+        {
+            JoinResponse response = new JoinResponse();
+            if(string.IsNullOrWhiteSpace(teamId))
+            {
+                response.Err = new Error
+                {
+                    Message = "Invalid Username",
+                    Description = "Failed to parse username from authorization header"
+                };
+                return response;
+            }
+
+            var currentPhase = await _context.Phases.Include(p => p.Round).OrderByDescending(p => p.TimeStamp).FirstOrDefaultAsync();
+
+            if(currentPhase == null)
+            {
+                response.Err = new Error
+                {
+                    Message = "Try after some time",
+                    Description = "Game is not running"
+                };
+            }
+            else if(!currentPhase.PhaseType.Equals(PhaseType.Joining))
+            {
+                response.Err = new Error
+                {
+                    Message = "Failed to Join the Round",
+                    Description = "Round is not in Joining phase"
+                };
+            }
+            else
+            {
+                var existingParticipant = await _context.Participants.Where(p => p.TeamId == teamId.ToLowerInvariant() && p.RoundId.CompareTo(currentPhase.RoundId) == 0).SingleOrDefaultAsync();
+                
+                if(existingParticipant == null)
+                {
+                    await _context.Participants.AddAsync(new Participant
+                    {
+                        GameId = currentPhase.GameId,
+                        RoundId = currentPhase.RoundId,
+                        IsAlive = true,
+                        TeamId = teamId.ToLowerInvariant(),
+                        JoinedAt = DateTime.UtcNow
+                    });
+                    await _context.Scores.AddAsync(new Score
+                    {
+                        GameId = currentPhase.GameId,
+                        RoundId = currentPhase.RoundId,
+                        PointsScored = 0,
+                        TimeStamp = DateTime.UtcNow,
+                        TeamId = teamId.ToLowerInvariant()
+                    });
+
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    response.Err = new Error
+                    {
+                        Message = "Can't Join Again",
+                        Description = "You have already joined the round"
+                    };
+                }
+
+                response.Data = new JoinResponseData { Joined = true };
+            }
+
+            if (response.Err != null)
+                response.Data = new JoinResponseData { Joined = false };
+
+            if (response.Data != null && currentPhase != null)
+            {
+                var responseData = response.Data;
+                responseData.GameId = currentPhase.GameId;
+                responseData.RoundId = currentPhase.RoundId;
+                responseData.RoundNumber = currentPhase.Round.RoundNumber;
+                responseData.Status = currentPhase.PhaseType.ToString();
+            }
+
+            return response;
+        }
     }
 }

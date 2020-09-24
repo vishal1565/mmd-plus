@@ -8,7 +8,7 @@ namespace DataAccess.Model
         public Guid GameId { get; set; }
         public Guid RoundId { get; set; }
         public string TeamId { get; set; }
-        public Guid GuessId { get; set; }
+        public Guid? GuessId { get; set; }
         public long PointsScored { get; set; }
         public DateTime TimeStamp { get; set; }
         public Game Game { get; set; }
