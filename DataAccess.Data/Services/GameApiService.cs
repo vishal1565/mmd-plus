@@ -23,7 +23,7 @@ namespace DataAccess.Data.Services
             _requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
         }
 
-        public async Task<GameStatusResponse> GetCurrentStatus()
+        public virtual async Task<GameStatusResponse> GetCurrentStatus()
         {
             try
             {

@@ -67,7 +67,7 @@ namespace GameApi.Tests.Helpers.TestClasses
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
         }
 
         IQueryProvider IQueryable.Provider

@@ -124,5 +124,15 @@ namespace GameApi.Tests.Helpers
                 .AsQueryable();
             }
         }
+
+        public static IQueryable<Phase> Phases
+        {
+            get
+            {
+                return new List<Phase> { 
+                    new Phase { GameId = GameId, RoundId = Round1Id, PhaseType = PhaseType.Joining, TimeStamp = DateTime.UtcNow }
+                }.AsQueryable();
+            }
+        }
     }
 }
