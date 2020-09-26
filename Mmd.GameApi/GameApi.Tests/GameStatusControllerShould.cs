@@ -95,7 +95,7 @@ namespace GameApi.Tests
             dataContext.SetupGet(x => x.Phases).Returns(mockPhases.Object);
             var requestContext = new RequestContext();
             var gameApiServiceLogger = GetMockLogger<GameApiService>().Object;
-            var gameApiService = new Mock<GameApiService>(dataContext.Object, gameApiServiceLogger, requestContext).Object;
+            var gameApiService = new Mock<GameApiService>(dataContext.Object, gameApiServiceLogger, requestContext) { CallBase = true }.Object;
             var requestLoggingService = new RequestLoggingService(requestContext, dataContext.Object);
             var logger = GetMockLogger<GameStatusController>().Object;
             var modController = new GameStatusController(requestContext, gameApiService, requestLoggingService, logger);
