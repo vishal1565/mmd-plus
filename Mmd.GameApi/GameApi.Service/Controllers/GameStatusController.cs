@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
+using GameApi.Service.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

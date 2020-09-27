@@ -181,5 +181,10 @@ namespace DataAccess.Data.Services
 
             return response;
         }
+
+        public Task<bool> ValidRequest(string path, string username, DateTime utcNow)
+        {
+            return new Task<bool>(() => true);
+        }
     }
 }

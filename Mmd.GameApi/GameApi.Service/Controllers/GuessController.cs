@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
+using GameApi.Service.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,9 +13,10 @@ using Microsoft.Extensions.Logging;
 namespace GameApi.Service.Controllers
 {
     [ApiController]
-    [Authorize(AuthenticationSchemes = "BasicAuth")]
+    //[Authorize(AuthenticationSchemes = "BasicAuth")]
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [Throttle]
     public class GuessController : Controller
     {
         private readonly RequestContext requestContext;
@@ -30,18 +32,26 @@ namespace GameApi.Service.Controllers
             this.logger = logger ?? throw new ArgumentNullException("Logger");
         }
 
+        [HttpGet]
+        public async Task<JsonResult> Get()
+        {
+            return new JsonResult(new GuessResponse());
+        }
+
         [HttpPost]
-        public async Task<JsonResult> Post([FromBody] GuessRequestBody body)
+        public async Task<JsonResult> Post([FromBody] GuessRequestBody requestBody)
         {
             JsonResult response;
+
             try
             {
                 GuessResponse guessResponse = new GuessResponse();
 
-                // Validation Check
-                // Throttling Check
-                // PreProcess Guess
-                // Apply Guess
+                var guesses = requestBody.Guesses;
+
+                // PreProcess here
+
+                var body = PreProcess(requestBody);
 
                 guessResponse.RequestId = requestContext.RequestId;
 
@@ -78,6 +88,24 @@ namespace GameApi.Service.Controllers
             }
 
             return response;
+        }
+
+        private GuessRequestBody PreProcess(GuessRequestBody requestBody)
+        {
+            var newModel = new GuessRequestBody();
+
+            newModel.Guesses = new List<SingleGuessRequestObject>();
+
+            foreach(var guess in requestBody.Guesses)
+            {
+                newModel.Guesses.Add(new SingleGuessRequestObject
+                {
+                    Team = guess.Team.ToLowerInvariant(),
+                    Guess = guess.Guess.ToLowerInvariant()
+                });
+            }
+
+            return newModel;
         }
     }
 }

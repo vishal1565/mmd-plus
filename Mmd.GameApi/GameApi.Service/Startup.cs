@@ -7,6 +7,7 @@ using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
 using DataAccess.Model.SharedModels;
 using GameApi.Service.Handlers;
+using GameApi.Service.Middleware;
 using GameApi.Service.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace GameApi.Service
 {
@@ -64,6 +66,8 @@ namespace GameApi.Service
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<ThrottlingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
