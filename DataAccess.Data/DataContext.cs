@@ -21,6 +21,7 @@ namespace DataAccess.Data
         public virtual DbSet<RoundConfig> RoundConfigs { get; set; }
         public virtual DbSet<Score> Scores { get; set; }
         public virtual DbSet<Team> Teams { get; set; }
+        public virtual DbSet<ThrottledRequest> ThrottledRequests { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         public DataContext()
@@ -328,6 +329,18 @@ namespace DataAccess.Data
                       .HasConstraintName("FK_Team_Loc");
 
                 entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<ThrottledRequest>(entity =>
+            {
+                entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.HasKey(t => t.HitId);
+                entity.Property(t => t.TeamId).HasMaxLength(20).IsRequired();
+                entity.Property(t => t.LastHit).HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(t => t.Team).WithMany(t => t.ThrottledRequests)
+                    .HasForeignKey(t => t.TeamId)
+                    .HasConstraintName("FK__TRreq__Team");
             });
 
             modelBuilder.Entity<User>(entity => 
