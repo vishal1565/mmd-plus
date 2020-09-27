@@ -206,7 +206,8 @@ namespace DataAccess.Data.Services
                 else
                 {
                     var existingRequestWithSameLastHit = await _context.ThrottledRequests.Where(tr => tr.HitId == key && tr.LastHit == existingRequest.LastHit).SingleOrDefaultAsync();
-                    existingRequestWithSameLastHit.LastHit = _requestContext.TimeStamp;
+                    if(existingRequestWithSameLastHit != null)
+                        existingRequestWithSameLastHit.LastHit = _requestContext.TimeStamp;
                 }
             }
             await _context.SaveChangesAsync();
