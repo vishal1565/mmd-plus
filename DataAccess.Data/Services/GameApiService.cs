@@ -182,9 +182,35 @@ namespace DataAccess.Data.Services
             return response;
         }
 
-        public Task<bool> ValidRequest(string path, string username, DateTime utcNow)
+        public async Task<bool> ValidRequest(string path, string username)
         {
-            return new Task<bool>(() => true);
+            bool validRequest = true;
+            path = path.ToLowerInvariant();
+            username = username.ToLowerInvariant();
+            var key = $"{username}-{path}";
+            var existingRequest = await _context.ThrottledRequests.FindAsync(key);
+            if (existingRequest == null)
+            {
+                await _context.ThrottledRequests.AddAsync(new ThrottledRequest
+                {
+                    HitId = key,
+                    Path = path,
+                    TeamId = username,
+                    LastHit = _requestContext.TimeStamp
+                });
+            }
+            else
+            {
+                if (_requestContext.TimeStamp - existingRequest.LastHit < new TimeSpan(0, 0, 5))
+                    validRequest = false;
+                else
+                {
+                    var existingRequestWithSameLastHit = await _context.ThrottledRequests.Where(tr => tr.HitId == key && tr.LastHit == existingRequest.LastHit).SingleOrDefaultAsync();
+                    existingRequestWithSameLastHit.LastHit = _requestContext.TimeStamp;
+                }
+            }
+            await _context.SaveChangesAsync();
+            return validRequest;
         }
     }
 }

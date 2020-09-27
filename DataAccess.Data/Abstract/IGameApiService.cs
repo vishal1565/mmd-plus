@@ -9,6 +9,6 @@ namespace DataAccess.Data.Abstract
     {
         public Task<GameStatusResponse> GetCurrentStatus();
         public Task<JoinResponse> JoinCurrentRound(string teamId);
-        Task<bool> ValidRequest(string path, string username, DateTime utcNow);
+        Task<bool> ValidRequest(string path, string username);
     }
 }

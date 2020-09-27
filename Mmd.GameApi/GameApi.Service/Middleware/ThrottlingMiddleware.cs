@@ -48,11 +48,9 @@ namespace GameApi.Service.Middleware
                         var throttleAttribute = (ThrottleAttribute)metadataObject;
                         var path = httpContext.Request.Path;
                         var username = httpContext.User.Identity.Name;
-                        if (username == null || !path.HasValue || !(await gameApiService.ValidRequest(path.ToString(), username, DateTime.UtcNow)))
+                        if (username == null || !path.HasValue || !(await gameApiService.ValidRequest(path.ToString(), username)))
                         {
                             logger.LogWarning($"Request { requestContext.RequestId } rejected in api throttling");
-
-                            //await RecordRequest(httpContext, requestLoggingService, logger, requestContext);
                             
                             string json = JsonConvert.SerializeObject(new GuessResponse
                             {
