@@ -84,11 +84,11 @@ namespace GameApi.Service.Middleware
             {
                 var requestMethod = (RequestMethod)Enum.Parse(typeof(RequestMethod), httpContext.Request.Method);
 
-                httpContext.Request.Path.StartsWithSegments("/api/", out PathString apiString);
+                var requestApi = httpContext.Request.Path;
 
-                var requestApi = (RequestApi)Enum.Parse(typeof(RequestApi), apiString);
+                var statusCode = 400;
 
-                await requestLoggingService.RecordRequest(requestMethod, 400, requestApi);
+                await requestLoggingService.RecordRequest(requestMethod, statusCode, requestApi);
             }
             catch(Exception)
             {

@@ -21,7 +21,7 @@ namespace DataAccess.Data.Services
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
             this.context = context ?? throw new ArgumentNullException("Context");
         }
-        public async Task RecordRequest(RequestMethod method, int? statusCode, RequestApi requestApi)
+        public async Task RecordRequest(RequestMethod method, int? statusCode, string requestApi, string teamId)
         {
             var currentPhase = await context.Phases.OrderByDescending(p => p.TimeStamp).FirstOrDefaultAsync();
 
@@ -31,7 +31,8 @@ namespace DataAccess.Data.Services
                 RoundId = currentPhase?.RoundId,
                 RequestId = requestContext.RequestId,
                 StatusCode = (HttpStatusCode)statusCode,
-                RequestApi = requestApi.ToString(),
+                TeamId = teamId,
+                RequestApi = requestApi,
                 RequestMethod = method,
                 TimeStamp = requestContext.TimeStamp
             };

@@ -8,6 +8,6 @@ namespace DataAccess.Data.Abstract
 {
     public interface IRequestLoggingService
     {
-        Task RecordRequest(RequestMethod method, int? statusCode, RequestApi requestApi);
+        Task RecordRequest(RequestMethod method, int? statusCode, string requestApi, string teamId);
     }
 }

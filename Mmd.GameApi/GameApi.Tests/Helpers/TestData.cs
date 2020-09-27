@@ -71,10 +71,10 @@ namespace GameApi.Tests.Helpers
             {
                 return new List<Request>
                 {
-                    new Request { Id = 1, RequestApi = RequestApi.Gamestatus, RequestMethod = RequestMethod.GET, TimeStamp = DateTime.UtcNow },
-                    new Request { Id = 2, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Gamestatus, RequestMethod = RequestMethod.GET, TimeStamp = DateTime.UtcNow },
-                    new Request { Id = 3, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Join, RequestMethod = RequestMethod.POST, TimeStamp = DateTime.UtcNow },
-                    new Request { Id = 4, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Guess, RequestMethod = RequestMethod.POST, TimeStamp = DateTime.UtcNow }
+                    new Request { Id = 1, RequestApi = RequestApi.Gamestatus.ToString(), RequestMethod = RequestMethod.GET, TimeStamp = DateTime.UtcNow },
+                    new Request { Id = 2, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Gamestatus.ToString(), RequestMethod = RequestMethod.GET, TimeStamp = DateTime.UtcNow },
+                    new Request { Id = 3, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Join.ToString(), RequestMethod = RequestMethod.POST, TimeStamp = DateTime.UtcNow },
+                    new Request { Id = 4, GameId = GameId, RoundId = Round1Id, RequestApi = RequestApi.Guess.ToString(), RequestMethod = RequestMethod.POST, TimeStamp = DateTime.UtcNow }
                 }
                 .AsQueryable();
             }
