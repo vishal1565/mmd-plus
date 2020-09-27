@@ -209,10 +209,12 @@ namespace DataAccess.Data
 
                 entity.HasKey(req => req.RequestId);
 
-                entity.Property(req => req.RequestApi).HasConversion(
-                    type => type.ToString(), // code to db
-                    type => (RequestApi)Enum.Parse(typeof(RequestApi), type) // db to code
-                ).IsRequired();
+                //entity.Property(req => req.RequestApi).HasConversion(
+                //    type => type.ToString(), // code to db
+                //    type => (RequestApi)Enum.Parse(typeof(RequestApi), type) // db to code
+                //).IsRequired();
+
+                entity.Property(req => req.RequestApi).IsRequired();
 
                 entity.Property(req => req.RequestMethod).HasConversion(
                     type => type.ToString(), // code to db

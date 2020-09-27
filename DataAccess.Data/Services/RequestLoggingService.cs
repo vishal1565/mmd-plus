@@ -31,7 +31,7 @@ namespace DataAccess.Data.Services
                 RoundId = currentPhase?.RoundId,
                 RequestId = requestContext.RequestId,
                 StatusCode = (HttpStatusCode)statusCode,
-                RequestApi = requestApi,
+                RequestApi = requestApi.ToString(),
                 RequestMethod = method,
                 TimeStamp = requestContext.TimeStamp
             };

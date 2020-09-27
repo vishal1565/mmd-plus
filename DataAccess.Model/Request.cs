@@ -11,7 +11,7 @@ namespace DataAccess.Model
         public Guid RequestId { get; set; }
         public string TeamId { get; set; }
         public RequestMethod RequestMethod { get; set; }
-        public RequestApi RequestApi { get; set; }
+        public string RequestApi { get; set; }
         public HttpStatusCode StatusCode { get; set; }
         public DateTime TimeStamp { get; set; }
         public Game Game { get; set; }

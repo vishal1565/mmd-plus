@@ -61,15 +61,6 @@ namespace GameApi.Service.Controllers
                 };
             }
 
-            try
-            {
-                await requestLoggingService.RecordRequest(RequestMethod.GET, response.StatusCode, RequestApi.Gamestatus);
-            }
-            catch(Exception ex)
-            {
-                logger.LogError($"Failed to record request to database, {ex}");
-            }
-
             return response;
         }
     }
