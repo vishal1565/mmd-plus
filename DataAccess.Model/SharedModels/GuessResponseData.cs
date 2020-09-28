@@ -4,6 +4,6 @@ namespace DataAccess.Model.SharedModels
 {
     public class GuessResponseData : ApiResponseData
     {
-        public List<string> Guesses { get; set; }
+        public List<SingleGuessResponseObject> Guesses { get; set; }
     }
 }

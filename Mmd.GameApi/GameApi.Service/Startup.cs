@@ -45,6 +45,7 @@ namespace GameApi.Service
             services.AddScoped<IGameApiService, GameApiService>();
             services.AddScoped<IRequestLoggingService, RequestLoggingService>();
             services.AddScoped<RequestContext>();
+            services.AddScoped<EvaluationModule>();
             services.AddControllers().AddNewtonsoftJson();
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContext<DataContext>(options =>

@@ -155,6 +155,8 @@ namespace DataAccess.Data
 
                 entity.Property(p => p.TeamId).IsRequired().HasMaxLength(20);
 
+                entity.Property(p => p.Secret).IsRequired();
+
                 entity.Property(p => p.IsAlive).IsRequired().HasDefaultValue(true);
 
                 entity.Property(guess => guess.JoinedAt).IsRequired().HasColumnType(TIMESTAMP_TYPE);

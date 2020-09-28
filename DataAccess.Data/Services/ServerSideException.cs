@@ -42,4 +42,44 @@ namespace DataAccess.Data.Services
         {
         }
     }
+
+    [Serializable]
+    public class TeamNotJoinedException : Exception
+    {
+        public TeamNotJoinedException()
+        {
+        }
+
+        public TeamNotJoinedException(string message) : base(message)
+        {
+        }
+
+        public TeamNotJoinedException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected TeamNotJoinedException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+    [Serializable]
+    public class GameNotInRunningPhaseException : Exception
+    {
+        public GameNotInRunningPhaseException()
+        {
+        }
+
+        public GameNotInRunningPhaseException(string message) : base(message)
+        {
+        }
+
+        public GameNotInRunningPhaseException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected GameNotInRunningPhaseException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
 }

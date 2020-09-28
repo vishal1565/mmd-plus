@@ -8,6 +8,7 @@ namespace DataAccess.Model
         public Guid GameId { get; set; }
         public Guid RoundId { get; set; }
         public string TeamId { get; set; }
+        public string Secret { get; set; }
         public bool? IsAlive { get; set; }
         public DateTime JoinedAt { get; set; }
         public Game Game { get; set; }

@@ -10,5 +10,7 @@ namespace DataAccess.Data.Abstract
         public Task<GameStatusResponse> GetCurrentStatus();
         public Task<JoinResponse> JoinCurrentRound(string teamId);
         Task<bool> ValidRequest(string path, string username, long ticks);
+        Task<bool> IsTeamAlive(string targetTeam);
+        Task<bool> IsCurrentPhaseRunning();
     }
 }

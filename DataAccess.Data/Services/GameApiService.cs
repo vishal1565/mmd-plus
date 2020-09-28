@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
+using Fare;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -99,6 +100,28 @@ namespace DataAccess.Data.Services
             }
         }
 
+        public async Task<Phase> GetCurrentPhase()
+        {
+            return await _context.Phases.OrderByDescending(p => p.TimeStamp).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsCurrentPhaseRunning()
+        {
+            var currentPhase = await GetCurrentPhase();
+            return currentPhase == null ? false : currentPhase.PhaseType == PhaseType.Running;
+        }
+
+        public async Task<bool> IsTeamAlive(string targetTeam)
+        {
+            var currentPhase = await GetCurrentPhase();
+            return (await _context.Participants.Where(p => 
+                p.TeamId == targetTeam && 
+                p.IsAlive != null && 
+                p.IsAlive == true &&
+                p.RoundId.Equals(currentPhase.RoundId)    
+            ).SingleOrDefaultAsync()) != null;
+        }
+
         public virtual async Task<JoinResponse> JoinCurrentRound(string teamId)
         {
             JoinResponse response = new JoinResponse();
@@ -133,8 +156,9 @@ namespace DataAccess.Data.Services
             else
             {
                 var existingParticipant = await _context.Participants.Where(p => p.TeamId == teamId.ToLowerInvariant() && p.RoundId.CompareTo(currentPhase.RoundId) == 0).SingleOrDefaultAsync();
-                
-                if(existingParticipant == null)
+                var roundConfig = await _context.RoundConfigs.Where(rc => rc.Id == currentPhase.Round.RoundNumber).SingleOrDefaultAsync();
+
+                if (existingParticipant == null)
                 {
                     await _context.Participants.AddAsync(new Participant
                     {
@@ -142,6 +166,7 @@ namespace DataAccess.Data.Services
                         RoundId = currentPhase.RoundId,
                         IsAlive = true,
                         TeamId = teamId.ToLowerInvariant(),
+                        Secret = GenerateSecret(roundConfig?.SecretLength),
                         JoinedAt = DateTime.UtcNow
                     });
                     await _context.Scores.AddAsync(new Score
@@ -180,6 +205,17 @@ namespace DataAccess.Data.Services
             }
 
             return response;
+        }
+
+        private string GenerateSecret(int? secretLength)
+        {
+            if (secretLength == null)
+                secretLength = 5;
+
+            var regex = "^[0-9]{" + secretLength + "}$";
+
+            var xeger = new Xeger(regex);
+            return xeger.Generate();
         }
 
         public async Task<bool> ValidRequest(string path, string username, long ticks)
