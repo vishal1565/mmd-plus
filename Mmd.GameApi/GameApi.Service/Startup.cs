@@ -46,6 +46,23 @@ namespace GameApi.Service
             services.AddScoped<IRequestLoggingService, RequestLoggingService>();
             services.AddScoped<RequestContext>();
             services.AddScoped<EvaluationModule>();
+            services.AddScoped<GameContext>(factory =>
+            {
+                var context = factory.GetRequiredService<DataContext>();
+                var currentState = context.Phases
+                .Include(p => p.Round)
+                    .ThenInclude(p => p.Participants)
+                .OrderByDescending(p => p.TimeStamp).SingleOrDefault();
+
+                return new GameContext
+                {
+                    GameId = currentState.GameId,
+                    RoundId = currentState.RoundId,
+                    RoundNumber = currentState.Round.RoundNumber,
+                    CurrentPhase = currentState.PhaseType,
+                    Participants = currentState.Round.Participants.ToList()
+                };
+            });
             services.AddControllers().AddNewtonsoftJson();
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContext<DataContext>(options =>

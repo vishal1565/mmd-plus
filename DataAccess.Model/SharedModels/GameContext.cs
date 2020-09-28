@@ -10,5 +10,6 @@ namespace DataAccess.Model.SharedModels
         public Guid RoundId { get; set; }
         public PhaseType CurrentPhase { get; set; }
         public int RoundNumber { get; set; }
+        public List<Participant> Participants { get; set; }
     }
 }

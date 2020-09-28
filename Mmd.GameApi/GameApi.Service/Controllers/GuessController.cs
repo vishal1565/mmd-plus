@@ -21,15 +21,13 @@ namespace GameApi.Service.Controllers
     {
         private readonly RequestContext requestContext;
         private readonly IGameApiService gameApiService;
-        private readonly IRequestLoggingService requestLoggingService;
         private readonly ILogger<GuessController> logger;
         private readonly EvaluationModule evaluationModule;
 
-        public GuessController(RequestContext requestContext, IGameApiService gameApiService, IRequestLoggingService requestLoggingService, ILogger<GuessController> logger, EvaluationModule evaluationModule)
+        public GuessController(RequestContext requestContext, IGameApiService gameApiService, ILogger<GuessController> logger, EvaluationModule evaluationModule)
         {
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
             this.gameApiService = gameApiService ?? throw new ArgumentNullException("GameApiService");
-            this.requestLoggingService = requestLoggingService ?? throw new ArgumentNullException("RequestLoggingService");
             this.logger = logger ?? throw new ArgumentNullException("Logger");
             this.evaluationModule = evaluationModule ?? throw new ArgumentNullException("Logger");
         }
