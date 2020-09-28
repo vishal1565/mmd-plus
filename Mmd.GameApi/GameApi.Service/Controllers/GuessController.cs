@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
+using DataAccess.Data.Services;
 using DataAccess.Model;
 using DataAccess.Model.SharedModels;
 using GameApi.Service.Providers;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace GameApi.Service.Controllers
 {
     [ApiController]
-    //[Authorize(AuthenticationSchemes = "BasicAuth")]
+    [Authorize(AuthenticationSchemes = "BasicAuth")]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [Throttle]
@@ -53,11 +54,28 @@ namespace GameApi.Service.Controllers
 
                 var body = PreProcess(requestBody);
 
+                var validatedBody = await Validate(body);
+
                 guessResponse.RequestId = requestContext.RequestId;
 
                 response = new JsonResult(guessResponse)
                 {
                     StatusCode = 200
+                };
+            }
+            catch(InvalidDataProvidedException)
+            {
+                response = new JsonResult(new GuessResponse
+                {
+                    RequestId = requestContext.RequestId,
+                    Err = new Error
+                    {
+                        Message = "Invalid Request Body",
+                        Description = "Please provide a proper body for the api"
+                    }
+                })
+                {
+                    StatusCode = 400
                 };
             }
             catch (Exception)
@@ -78,11 +96,21 @@ namespace GameApi.Service.Controllers
                 };
             }
 
+
             return response;
+        }
+
+        private async Task<GuessResponseBody> Validate(GuessRequestBody body)
+        {
+            if (body == null || body.Guesses == null)
+                return null;
         }
 
         private GuessRequestBody PreProcess(GuessRequestBody requestBody)
         {
+            if (requestBody == null || requestBody.Guesses == null)
+                throw new InvalidDataProvidedException($"Found Invalid Data in GuessRequestBody {requestContext.RequestId}");
+
             var newModel = new GuessRequestBody();
 
             newModel.Guesses = new List<SingleGuessRequestObject>();

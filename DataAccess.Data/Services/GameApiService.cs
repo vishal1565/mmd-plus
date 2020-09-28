@@ -182,7 +182,7 @@ namespace DataAccess.Data.Services
             return response;
         }
 
-        public async Task<bool> ValidRequest(string path, string username)
+        public async Task<bool> ValidRequest(string path, string username, long ticks)
         {
             bool validRequest = true;
             path = path.ToLowerInvariant();
@@ -201,7 +201,7 @@ namespace DataAccess.Data.Services
             }
             else
             {
-                if (_requestContext.TimeStamp - existingRequest.LastHit < new TimeSpan(0, 0, 5))
+                if (_requestContext.TimeStamp - existingRequest.LastHit < new TimeSpan(ticks))
                     validRequest = false;
                 else
                 {

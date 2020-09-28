@@ -48,7 +48,7 @@ namespace GameApi.Service.Middleware
                         var throttleAttribute = (ThrottleAttribute)metadataObject;
                         var path = httpContext.Request.Path;
                         var username = httpContext.User.Identity.Name;
-                        if (username == null || !path.HasValue || !(await gameApiService.ValidRequest(path.ToString(), username)))
+                        if (username == null || !path.HasValue || !await gameApiService.ValidRequest(path.ToString(), username, throttleAttribute.ticks))
                         {
                             logger.LogWarning($"Request { requestContext.RequestId } rejected in api throttling");
                             
@@ -74,24 +74,6 @@ namespace GameApi.Service.Middleware
             }
 
             await _next(httpContext);
-        }
-        
-        private async Task RecordRequest(HttpContext httpContext, IRequestLoggingService requestLoggingService, ILogger<ThrottlingMiddleware> logger, RequestContext requestContext)
-        {
-            try
-            {
-                var requestMethod = (RequestMethod)Enum.Parse(typeof(RequestMethod), httpContext.Request.Method);
-
-                var requestApi = httpContext.Request.Path;
-
-                var statusCode = 400;
-
-                await requestLoggingService.RecordRequest(requestMethod, statusCode, requestApi);
-            }
-            catch(Exception)
-            {
-                logger.LogError($"Failed to record request {requestContext.RequestId}");
-            }
         }
     }
 }
