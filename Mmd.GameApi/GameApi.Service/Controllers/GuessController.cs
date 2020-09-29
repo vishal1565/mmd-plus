@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
+using DataAccess.Model;
 using DataAccess.Model.SharedModels;
 using GameApi.Service.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -23,13 +25,15 @@ namespace GameApi.Service.Controllers
         private readonly IGameApiService gameApiService;
         private readonly ILogger<GuessController> logger;
         private readonly EvaluationModule evaluationModule;
+        private readonly GameContext gameContext;
 
-        public GuessController(RequestContext requestContext, IGameApiService gameApiService, ILogger<GuessController> logger, EvaluationModule evaluationModule)
+        public GuessController(RequestContext requestContext, IGameApiService gameApiService, ILogger<GuessController> logger, EvaluationModule evaluationModule, GameContext gameContext)
         {
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
             this.gameApiService = gameApiService ?? throw new ArgumentNullException("GameApiService");
             this.logger = logger ?? throw new ArgumentNullException("Logger");
             this.evaluationModule = evaluationModule ?? throw new ArgumentNullException("Logger");
+            this.gameContext = gameContext ?? throw new ArgumentNullException("GameContext");
         }
 
         [HttpPost]
@@ -44,10 +48,10 @@ namespace GameApi.Service.Controllers
                     RequestId = requestContext.RequestId
                 };
 
-                if (!await gameApiService.IsCurrentPhaseRunning())
+                if (!gameContext.CurrentPhase.Equals(PhaseType.Running))
                     throw new GameNotInRunningPhaseException();
 
-                if (!await gameApiService.IsTeamAlive(User.Identity.Name))
+                if (gameContext.Participants.Where(p => p.TeamId == User.Identity.Name && p.IsAlive != null && p.IsAlive == true).FirstOrDefault() == null)
                     throw new TeamNotJoinedException();
 
                 var guesses = requestBody.Guesses;
@@ -123,7 +127,9 @@ namespace GameApi.Service.Controllers
             {
                 if(guess.IsValid)
                 {
-                    bool targetTeamIsAlive = await gameApiService.IsTeamAlive(guess.TargetTeam);
+                    var targetParticipant = gameContext.Participants.Where(p => p.TeamId == guess.TargetTeam && p.IsAlive != null && p.IsAlive == true).FirstOrDefault();
+
+                    bool targetTeamIsAlive = targetParticipant == null;
 
                     if (!targetTeamIsAlive)
                     {
@@ -132,7 +138,7 @@ namespace GameApi.Service.Controllers
                     }
                     else
                     {
-                        var evaluationResult = await evaluationModule.EvaluateTheGuess(guess.TargetTeam, guess.Guess);
+                        var evaluationResult = await evaluationModule.EvaluateTheGuess(guess.TargetTeam, guess.Guess, targetParticipant.Secret);
 
                         guess.NoOfDigitsMatchedByPositionAndValue = evaluationResult.NoOfDigitsMatchedByValueAndPosition;
                         guess.NoOfDigitsMatchedByValue = evaluationResult.NoOfDigitsMatchedByValue;

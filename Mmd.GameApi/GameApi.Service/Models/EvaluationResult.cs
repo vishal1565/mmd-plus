@@ -10,5 +10,7 @@ namespace GameApi.Service.Models
         public int NoOfDigitsMatchedByValueAndPosition { get; set; }
         public int NoOfDigitsMatchedByValue { get; set; }
         public long PointsScored { get; set; }
+        public string ErrMessage { get; set; }
+        public bool CorrectGuess { get; set; }
     }
 }
