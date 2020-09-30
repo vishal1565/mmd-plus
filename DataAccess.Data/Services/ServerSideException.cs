@@ -97,4 +97,9 @@ namespace DataAccess.Data.Services
     {
 
     }
+
+    public class GuessLimitExceededException : Exception
+    {
+
+    }
 }

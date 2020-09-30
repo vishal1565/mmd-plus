@@ -27,6 +27,8 @@ namespace GameApi.Service.Controllers
         private readonly EvaluationModule evaluationModule;
         private readonly GameContext gameContext;
 
+        private readonly int MAX_GUESSES = 5;
+
         public GuessController(RequestContext requestContext, IGameApiService gameApiService, ILogger<GuessController> logger, EvaluationModule evaluationModule, GameContext gameContext)
         {
             this.requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
@@ -58,17 +60,38 @@ namespace GameApi.Service.Controllers
 
                 var body = PreProcess(requestBody);
 
-                var validatedBody = Validate(body);
+                var validatedBody = Validate(body, User.Identity.Name);
 
                 await Evaluate(validatedBody);
 
                 await CommitGuess(validatedBody, requestBody);
 
-                guessResponse.Data = new GuessResponseData { Guesses = validatedBody.Guesses };
+                guessResponse.Data = new GuessResponseData { 
+                    Guesses = validatedBody.Guesses,
+                    GameId = gameContext.GameId,
+                    RoundId = gameContext.RoundId,
+                    RoundNumber = gameContext.RoundNumber,
+                    Status = gameContext.CurrentPhase.ToString()
+                };
                 
                 response = new JsonResult(guessResponse)
                 {
                     StatusCode = 200
+                };
+            }
+            catch(GuessLimitExceededException)
+            {
+                response = new JsonResult(new GuessResponse
+                {
+                    RequestId = requestContext.RequestId,
+                    Err = new Error
+                    {
+                        Message = "Guess Limit Exceeded",
+                        Description = $"At max {MAX_GUESSES} guesses are allowd at a time"
+                    }
+                })
+                {
+                    StatusCode = 400
                 };
             }
             catch(GameNotInRunningPhaseException)
@@ -171,9 +194,13 @@ namespace GameApi.Service.Controllers
             }
         }
 
-        private GuessResponseBody Validate(GuessRequestBody body)
+        private GuessResponseBody Validate(GuessRequestBody body, string guessingTeam)
         {
             var guesses = body.Guesses;
+
+            if (body.Guesses != null && body.Guesses.Count() > MAX_GUESSES)
+                throw new GuessLimitExceededException();
+
             var guessResponseBody = new GuessResponseBody { Guesses = new List<SingleGuessResponseObject>() };
             foreach(var guess in guesses)
             {
@@ -188,6 +215,10 @@ namespace GameApi.Service.Controllers
                 else if(string.IsNullOrWhiteSpace(secretGuess) || !IsGuessRegexValid(secretGuess))
                 {
                     guessResponseObject.ErrMessage = "Invalid guess";
+                }
+                else if(targetTeam == guessingTeam)
+                {
+                    guessResponseObject.ErrMessage = "Can't guess for yourself";
                 }
 
                 if (string.IsNullOrEmpty(guessResponseObject.ErrMessage))
