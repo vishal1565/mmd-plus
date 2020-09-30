@@ -12,5 +12,7 @@ namespace DataAccess.Model.SharedModels
         public long TotalScore { get; set; }
         [JsonProperty(Order = 4)]
         public bool? IsAlive { get; set; }
+        [JsonProperty(Order = 5)]
+        public bool IsRobot { get; set; }
     }
 }

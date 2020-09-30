@@ -46,7 +46,7 @@ namespace DataAccess.Data.Services
                 else
                 {
                     var roundConfig = await _context.RoundConfigs.Where(rc => rc.Id == currentPhase.Round.RoundNumber).SingleOrDefaultAsync();
-                    var participants = await _context.Participants.Where(p => p.RoundId.CompareTo(currentPhase.RoundId) == 0).ToDictionaryAsync(p => p.TeamId);
+                    var participants = await _context.Participants.Include(p => p.Team).Where(p => p.RoundId.CompareTo(currentPhase.RoundId) == 0).ToDictionaryAsync(p => p.TeamId);
                     
                     var scores = await (from t in (from s in _context.Scores.Where(s => s.GameId.CompareTo(currentPhase.GameId) == 0)
                                                    group s by s.TeamId into scoreGroup
@@ -80,7 +80,8 @@ namespace DataAccess.Data.Services
                             TeamId = key,
                             CurrentScore = scores[key].CurrentScore,
                             TotalScore = scores[key].TotalScore,
-                            IsAlive = participants[key].IsAlive
+                            IsAlive = participants[key].IsAlive,
+                            IsRobot = participants[key].Team.IsRobot
                         });
                     }
                     response.Data = new GameStatusResponseData
@@ -268,10 +269,11 @@ namespace DataAccess.Data.Services
                 var roundConfig = await _context.RoundConfigs.FindAsync(_gameContext.RoundNumber);
                 if(roundConfig != null)
                 {
-                    var targetTeamKillCount = await _context.Kills.Where(k => k.RoundId == _gameContext.RoundId && k.VictimId == targetTeam).CountAsync();
+                    var targetTeamKillCount = await _context.Kills.Where(k => k.RoundId.CompareTo(_gameContext.RoundId) == 0 && k.VictimId == targetTeam).CountAsync();
 
                     if (targetTeamKillCount == roundConfig.LifeLines)
                         throw new TargetTeamDeadException();
+
                     else if (targetTeamKillCount < roundConfig.LifeLines)
                         await _context.Kills.AddAsync(new Kill
                         {
