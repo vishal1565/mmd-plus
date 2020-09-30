@@ -240,7 +240,9 @@ namespace DataAccess.Data.Services
             }
             else
             {
-                if (_requestContext.TimeStamp - existingRequest.LastHit < new TimeSpan(ticks))
+                var utcLastHit = TimeZoneInfo.ConvertTimeToUtc((DateTime)existingRequest.LastHit);
+
+                if (_requestContext.TimeStamp - utcLastHit < new TimeSpan(ticks))
                     validRequest = false;
                 else
                 {
@@ -255,8 +257,8 @@ namespace DataAccess.Data.Services
 
         public async Task ApplyEvaluation(string guessingTeam, string targetTeam, long pointsScored, bool correctGuess)
         {
-            var guessingTeamEntity = await _context.Participants.FindAsync(new { _gameContext.RoundId, guessingTeam });
-            var targetTeamEntity = await _context.Participants.FindAsync(new { _gameContext.RoundId, targetTeam });
+            var guessingTeamEntity = await _context.Participants.FindAsync(_gameContext.RoundId, guessingTeam);
+            var targetTeamEntity = await _context.Participants.FindAsync(_gameContext.RoundId, targetTeam);
 
             if (guessingTeamEntity.IsAlive != null && guessingTeamEntity.IsAlive == false)
                 throw new GuessingTeamDeadException();

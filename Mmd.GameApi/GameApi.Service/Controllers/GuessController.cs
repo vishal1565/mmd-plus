@@ -64,11 +64,26 @@ namespace GameApi.Service.Controllers
 
                 await CommitGuess(validatedBody, requestBody);
 
-                guessResponse.Data.Guesses = validatedBody.Guesses;
+                guessResponse.Data = new GuessResponseData { Guesses = validatedBody.Guesses };
                 
                 response = new JsonResult(guessResponse)
                 {
                     StatusCode = 200
+                };
+            }
+            catch(GameNotInRunningPhaseException)
+            {
+                response = new JsonResult(new GuessResponse
+                {
+                    RequestId = requestContext.RequestId,
+                    Err = new Error
+                    {
+                        Message = "Game is not in running phase",
+                        Description = "/guess api requests are only accepted in Running phase"
+                    }
+                })
+                {
+                    StatusCode = 400
                 };
             }
             catch(TeamNotJoinedException)
@@ -134,11 +149,11 @@ namespace GameApi.Service.Controllers
             {
                 if(guess.IsValid)
                 {
-                    var targetParticipant = gameContext.Participants.Where(p => p.TeamId == guess.TargetTeam && p.IsAlive != null && p.IsAlive == true).FirstOrDefault();
+                    var targetParticipant = gameContext.Participants.Where(p => p.TeamId == guess.TargetTeam && p.IsAlive == true).FirstOrDefault();
 
-                    bool targetTeamIsAlive = targetParticipant == null;
+                    bool targetTeamIsDead = targetParticipant == null;
 
-                    if (!targetTeamIsAlive)
+                    if (targetTeamIsDead)
                     {
                         guess.IsValid = false;
                         guess.ErrMessage = "Target Team is Dead";
