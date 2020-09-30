@@ -269,12 +269,19 @@ namespace DataAccess.Data.Services
                 var roundConfig = await _context.RoundConfigs.FindAsync(_gameContext.RoundNumber);
                 if(roundConfig != null)
                 {
-                    var targetTeamKillCount = await _context.Kills.Where(k => k.RoundId.CompareTo(_gameContext.RoundId) == 0 && k.VictimId == targetTeam).CountAsync();
+                    var targetTeamDeaths = await _context.Kills.Where(k => k.RoundId.CompareTo(_gameContext.RoundId) == 0 && k.VictimId == targetTeam).ToListAsync();
 
-                    if (targetTeamKillCount == roundConfig.LifeLines)
+                    var targetTeamDeathCount = targetTeamDeaths.Count();
+
+                    var alreadyKilledBySameTeam = targetTeamDeaths.Where(d => d.KillerId == guessingTeam).SingleOrDefault() != null;
+
+                    if (alreadyKilledBySameTeam)
+                        throw new TargetAlreadyKilledException();
+
+                    if (targetTeamDeathCount == roundConfig.LifeLines)
                         throw new TargetTeamDeadException();
 
-                    else if (targetTeamKillCount < roundConfig.LifeLines)
+                    else if (targetTeamDeathCount < roundConfig.LifeLines)
                         await _context.Kills.AddAsync(new Kill
                         {
                             GameId = _gameContext.GameId,
@@ -284,7 +291,7 @@ namespace DataAccess.Data.Services
                             TimeStamp = DateTime.UtcNow
                         });
 
-                    if (targetTeamKillCount + 1 == roundConfig.LifeLines)
+                    if (targetTeamDeathCount + 1 == roundConfig.LifeLines)
                         targetTeamEntity.IsAlive = false;
 
                     await _context.SaveChangesAsync();

@@ -92,4 +92,9 @@ namespace DataAccess.Data.Services
     {
 
     }
+
+    public class TargetAlreadyKilledException : Exception
+    {
+
+    }
 }

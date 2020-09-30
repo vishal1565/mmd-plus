@@ -39,6 +39,11 @@ namespace GameApi.Service
                 result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
                 result.ErrMessage = "Your team is dead, please try in next round";
             }
+            catch(TargetAlreadyKilledException)
+            {
+                result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
+                result.ErrMessage = "You have already killed this team";
+            }
             catch(Exception)
             {
                 result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
