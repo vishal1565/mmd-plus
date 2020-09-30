@@ -1,5 +1,5 @@
 ﻿using DataAccess.Data.Abstract;
-
+using DataAccess.Data.Services;
 using DataAccess.Model.SharedModels;
 using GameApi.Service.Models;
 using System;
@@ -21,13 +21,28 @@ namespace GameApi.Service
             _gameApiService = gameApiService ?? throw new ArgumentNullException("gameApiService");
         }
 
-        public async Task<EvaluationResult> EvaluateTheGuess(string targetTeam, string guess, string actualSecret)
+        public async Task<EvaluationResult> EvaluateTheGuess(string guessingTeam, string targetTeam, string guess, string actualSecret)
         {
             var result = CompareGuess(guess, actualSecret);
 
             try
             {
-                await _gameApiService.ApplyEvaluation()
+                await _gameApiService.ApplyEvaluation(guessingTeam, targetTeam, result.PointsScored, result.CorrectGuess);
+            }
+            catch(TargetTeamDeadException)
+            {
+                result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
+                result.ErrMessage = "Target Team is already dead";
+            }
+            catch(GuessingTeamDeadException)
+            {
+                result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
+                result.ErrMessage = "Your team is dead, please try in next round";
+            }
+            catch(Exception)
+            {
+                result.PointsScored = result.NoOfDigitsMatchedByValue = result.NoOfDigitsMatchedByValueAndPosition = 0;
+                result.ErrMessage = "Evaluation failed";
             }
 
             return result;

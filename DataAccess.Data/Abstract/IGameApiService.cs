@@ -12,5 +12,7 @@ namespace DataAccess.Data.Abstract
         Task<bool> ValidRequest(string path, string username, long ticks);
         Task<bool> IsTeamAlive(string targetTeam);
         Task<bool> IsCurrentPhaseRunning();
+        Task ApplyEvaluation(string guessingTeam, string targetTeam, long pointsScored, bool correctGuess);
+        Task CommitGuess(string guessingTeam, GuessRequestBody requestBody, GuessResponseBody validatedBody);
     }
 }

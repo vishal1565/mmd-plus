@@ -16,12 +16,14 @@ namespace DataAccess.Data.Services
         private readonly DataContext _context;
         private readonly ILogger<GameApiService> _logger;
         private readonly RequestContext _requestContext;
+        private readonly GameContext _gameContext;
 
-        public GameApiService(DataContext context, ILogger<GameApiService> logger, RequestContext requestContext)
+        public GameApiService(DataContext context, ILogger<GameApiService> logger, RequestContext requestContext, GameContext gameContext)
         {
             _context = context ?? throw new ArgumentNullException("DataContext");
             _logger = logger ?? throw new ArgumentNullException("DataContext");
             _requestContext = requestContext ?? throw new ArgumentNullException("RequestContext");
+            _gameContext = gameContext ?? throw new ArgumentNullException("GameContext");
         }
 
         public virtual async Task<GameStatusResponse> GetCurrentStatus()
@@ -248,6 +250,77 @@ namespace DataAccess.Data.Services
             }
             await _context.SaveChangesAsync();
             return validRequest;
+        }
+
+        public async Task ApplyEvaluation(string guessingTeam, string targetTeam, long pointsScored, bool correctGuess)
+        {
+            var guessingTeamEntity = await _context.Participants.FindAsync(new { _gameContext.RoundId, guessingTeam });
+            var targetTeamEntity = await _context.Participants.FindAsync(new { _gameContext.RoundId, targetTeam });
+
+            if (guessingTeamEntity.IsAlive != null && guessingTeamEntity.IsAlive == false)
+                throw new GuessingTeamDeadException();
+
+            if (targetTeamEntity.IsAlive != null && targetTeamEntity.IsAlive == false)
+                throw new TargetTeamDeadException();
+
+            if(correctGuess)
+            {
+                var roundConfig = await _context.RoundConfigs.FindAsync(_gameContext.RoundNumber);
+                if(roundConfig != null)
+                {
+                    var targetTeamKillCount = await _context.Kills.Where(k => k.RoundId == _gameContext.RoundId && k.VictimId == targetTeam).CountAsync();
+
+                    if (targetTeamKillCount == roundConfig.LifeLines)
+                        throw new TargetTeamDeadException();
+                    else if (targetTeamKillCount < roundConfig.LifeLines)
+                        await _context.Kills.AddAsync(new Kill
+                        {
+                            GameId = _gameContext.GameId,
+                            RoundId = _gameContext.RoundId,
+                            KillerId = guessingTeam,
+                            VictimId = targetTeam,
+                            TimeStamp = DateTime.UtcNow
+                        });
+
+                    if (targetTeamKillCount + 1 == roundConfig.LifeLines)
+                        targetTeamEntity.IsAlive = false;
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        public async Task CommitGuess(string guessingTeam, GuessRequestBody requestBody, GuessResponseBody responseBody)
+        {
+            long pointsScored = 0;
+
+            foreach (var guess in responseBody.Guesses)
+                pointsScored += guess.Score;
+
+            var guessId = Guid.NewGuid();
+
+            await _context.Guesses.AddAsync(new Guess
+            {
+                GameId = _gameContext.GameId,
+                RoundId = _gameContext.RoundId,
+                GuessId = guessId,
+                TeamId = guessingTeam,
+                GuessRequest = requestBody,
+                GuessResponse = responseBody,
+                TimeStamp = DateTime.UtcNow
+            });
+
+            await _context.Scores.AddAsync(new Score
+            {
+                GameId = _gameContext.GameId,
+                RoundId = _gameContext.RoundId,
+                PointsScored = pointsScored,
+                GuessId = guessId,
+                TeamId = guessingTeam,
+                TimeStamp = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
         }
     }
 }

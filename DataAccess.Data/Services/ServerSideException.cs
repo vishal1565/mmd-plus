@@ -82,4 +82,14 @@ namespace DataAccess.Data.Services
         {
         }
     }
+
+    public class GuessingTeamDeadException : Exception
+    {
+
+    }
+
+    public class TargetTeamDeadException : Exception
+    {
+
+    }
 }

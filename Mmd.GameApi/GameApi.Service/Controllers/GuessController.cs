@@ -62,6 +62,8 @@ namespace GameApi.Service.Controllers
 
                 await Evaluate(validatedBody);
 
+                await CommitGuess(validatedBody, requestBody);
+
                 guessResponse.Data.Guesses = validatedBody.Guesses;
                 
                 response = new JsonResult(guessResponse)
@@ -121,6 +123,11 @@ namespace GameApi.Service.Controllers
             return response;
         }
 
+        private async Task CommitGuess(GuessResponseBody validatedBody, GuessRequestBody requestBody)
+        {
+            await gameApiService.CommitGuess(User.Identity.Name, requestBody, validatedBody);
+        }
+
         private async Task Evaluate(GuessResponseBody validatedBody)
         {
             foreach(var guess in validatedBody.Guesses)
@@ -138,11 +145,12 @@ namespace GameApi.Service.Controllers
                     }
                     else
                     {
-                        var evaluationResult = await evaluationModule.EvaluateTheGuess(guess.TargetTeam, guess.Guess, targetParticipant.Secret);
+                        var evaluationResult = await evaluationModule.EvaluateTheGuess(User.Identity.Name, guess.TargetTeam, guess.Guess, targetParticipant.Secret);
 
                         guess.NoOfDigitsMatchedByPositionAndValue = evaluationResult.NoOfDigitsMatchedByValueAndPosition;
                         guess.NoOfDigitsMatchedByValue = evaluationResult.NoOfDigitsMatchedByValue;
                         guess.Score = evaluationResult.PointsScored;
+                        guess.ErrMessage = evaluationResult.ErrMessage;
                     }
                 }
             }

@@ -52,7 +52,7 @@ namespace GameApi.Service
                 var currentState = context.Phases
                 .Include(p => p.Round)
                     .ThenInclude(p => p.Participants)
-                .OrderByDescending(p => p.TimeStamp).SingleOrDefault();
+                .OrderByDescending(p => p.TimeStamp).FirstOrDefault();
 
                 return new GameContext
                 {
