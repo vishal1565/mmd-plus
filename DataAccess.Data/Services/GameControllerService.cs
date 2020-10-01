@@ -56,11 +56,6 @@ namespace DataAccess.Data.Services
                     };
 
                     currentGame.Rounds.Add(newRound);
-
-                    if (round.Id > 1)
-                    {
-                        //Method to copy prev Round score to current round
-                    }
                 }
                 else
                 {
@@ -94,7 +89,7 @@ namespace DataAccess.Data.Services
 
         public void EndGame(GameModel currGame)
         {
-            var currentGameInstance = _ctx.Games.Where(g => g.GameId == currGame.GameId).SingleOrDefault();
+            //var currentGameInstance = _ctx.Games.Where(g => g.GameId == currGame.GameId).SingleOrDefault();
             //EndGame
             Console.WriteLine("current Game ended");
         }

@@ -46,6 +46,7 @@ namespace Mmd.GameController
 
             //Add the game to the database
             _svc.AddNewGame(currentGame);
+
             RunGame().Wait();
         }
 
@@ -55,15 +56,8 @@ namespace Mmd.GameController
 
             foreach (var round in currentGame.Rounds)
             {
-                //Generate new round id
-                //round.Id = $"{currentGame.GameId}-{round.RoundNumber-1}";
-
                 //Add round to Database
-                //_svc.AddNewRound(round, currentGame, _previousRoundId);
                 _svc.AddNewRound(round, currentGame);
-
-                //Store prev round Id
-                //_previousRoundId = round.Id;
 
                 //Start async timer for Joining phase
                 Task phaseTimer = StartPhaseTimer(round.JoiningDuration);
