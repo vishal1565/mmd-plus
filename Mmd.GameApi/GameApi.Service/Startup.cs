@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DataAccess.Data;
 using DataAccess.Data.Abstract;
 using DataAccess.Data.Services;
+using DataAccess.Model;
 using DataAccess.Model.SharedModels;
 using GameApi.Service.Handlers;
 using GameApi.Service.Middleware;
@@ -36,34 +37,48 @@ namespace GameApi.Service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication()
-            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
-            services.AddHttpContextAccessor();
+            services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
             services.AddScoped<IAuthenticationSchemeProvider, CustomAuthenticationSchemeProvider>();
+            
+            services.AddHttpContextAccessor();
             services.AddLogging(cfg => cfg.AddConsole()).Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Warning);
+            
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<IGameApiService, GameApiService>();
             services.AddScoped<IRequestLoggingService, RequestLoggingService>();
+            
             services.AddScoped<RequestContext>();
             services.AddScoped<EvaluationModule>();
+            
             services.AddScoped<GameContext>(factory =>
             {
-                var context = factory.GetRequiredService<DataContext>();
-                var currentState = context.Phases
-                .Include(p => p.Round)
-                    .ThenInclude(p => p.Participants)
-                .OrderByDescending(p => p.TimeStamp).FirstOrDefault();
-
-                return new GameContext
+                try
                 {
-                    GameId = currentState.GameId,
-                    RoundId = currentState.RoundId,
-                    RoundNumber = currentState.Round.RoundNumber,
-                    CurrentPhase = currentState.PhaseType,
-                    Participants = currentState.Round.Participants.ToList()
-                };
+                    var context = factory.GetRequiredService<DataContext>();
+                    var currentState = context.Phases
+                    .Include(p => p.Round)
+                        .ThenInclude(p => p.Participants)
+                    .OrderByDescending(p => p.TimeStamp).FirstOrDefault();
+
+                    return new GameContext
+                    {
+                        GameId = currentState.GameId,
+                        RoundId = currentState.RoundId,
+                        RoundNumber = currentState.Round.RoundNumber,
+                        CurrentPhase = currentState.PhaseType,
+                        Participants = currentState.Round.Participants.ToList()
+                    };
+                }
+                catch (Exception ex)
+                {
+                    var logger = factory.GetRequiredService<ILogger<Startup>>();
+                    logger.LogError($"GameContext generation failed, {ex.Message}");
+                    return new GameContext { Participants = new List<Participant>() };
+                }
             });
+            
             services.AddControllers().AddNewtonsoftJson();
+            
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContext<DataContext>(options =>
             {

@@ -18,7 +18,7 @@ namespace DataAccess.Model.SharedModels
         [JsonProperty(Order = 2)]
         public Guid? RoundId { get; set; }
         [JsonProperty(Order = 3)]
-        public int? RoundNumber { get; set; }
+        public long? RoundNumber { get; set; }
         [JsonProperty(Order = 4)]
         public string Status { get; set; }
     }

@@ -266,20 +266,20 @@ namespace DataAccess.Data.Services
             if (targetTeamEntity.IsAlive != null && targetTeamEntity.IsAlive == false)
                 throw new TargetTeamDeadException();
 
-            if(correctGuess)
+            var targetTeamDeaths = await _context.Kills.Where(k => k.RoundId.CompareTo(_gameContext.RoundId) == 0 && k.VictimId == targetTeam).ToListAsync();
+
+            var targetTeamDeathCount = targetTeamDeaths.Count();
+
+            var alreadyKilledBySameTeam = targetTeamDeaths.Where(d => d.KillerId == guessingTeam).SingleOrDefault() != null;
+
+            if (alreadyKilledBySameTeam)
+                throw new TargetAlreadyKilledException();
+
+            if (correctGuess)
             {
                 var roundConfig = await _context.RoundConfigs.FindAsync(_gameContext.RoundNumber);
                 if(roundConfig != null)
                 {
-                    var targetTeamDeaths = await _context.Kills.Where(k => k.RoundId.CompareTo(_gameContext.RoundId) == 0 && k.VictimId == targetTeam).ToListAsync();
-
-                    var targetTeamDeathCount = targetTeamDeaths.Count();
-
-                    var alreadyKilledBySameTeam = targetTeamDeaths.Where(d => d.KillerId == guessingTeam).SingleOrDefault() != null;
-
-                    if (alreadyKilledBySameTeam)
-                        throw new TargetAlreadyKilledException();
-
                     if (targetTeamDeathCount == roundConfig.LifeLines)
                         throw new TargetTeamDeadException();
 
