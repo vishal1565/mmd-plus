@@ -17,7 +17,7 @@ namespace DataAccess.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.7")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("DataAccess.Model.FutureGame", b =>
@@ -73,10 +73,10 @@ namespace DataAccess.Data.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uuid");
 
-                    b.Property<GuessRequest>("GuessRequest")
+                    b.Property<GuessRequestBody>("GuessRequest")
                         .HasColumnType("jsonb");
 
-                    b.Property<GuessResponse>("GuessResponse")
+                    b.Property<GuessResponseBody>("GuessResponse")
                         .HasColumnType("jsonb");
 
                     b.Property<long>("Id")
@@ -187,6 +187,10 @@ namespace DataAccess.Data.Migrations
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Secret")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("RoundId", "TeamId");
 
                     b.HasIndex("GameId");
@@ -249,6 +253,9 @@ namespace DataAccess.Data.Migrations
                     b.Property<Guid?>("RoundId")
                         .HasColumnType("uuid")
                         .HasDefaultValue(null);
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TeamId")
                         .HasColumnType("character varying(20)")
@@ -336,7 +343,7 @@ namespace DataAccess.Data.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("GuessId")
+                    b.Property<Guid?>("GuessId")
                         .HasColumnType("uuid");
 
                     b.Property<long>("PointsScored")
@@ -402,6 +409,34 @@ namespace DataAccess.Data.Migrations
                     b.HasIndex("Location");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("DataAccess.Model.ThrottledRequest", b =>
+                {
+                    b.Property<string>("HitId")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime?>("LastHit")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(20);
+
+                    b.HasKey("HitId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("ThrottledRequests");
                 });
 
             modelBuilder.Entity("DataAccess.Model.User", b =>
@@ -570,8 +605,7 @@ namespace DataAccess.Data.Migrations
                         .WithOne("Score")
                         .HasForeignKey("DataAccess.Model.Score", "GuessId")
                         .HasConstraintName("FK__Score__Guess")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DataAccess.Model.Round", "Round")
                         .WithMany("Scores")
@@ -595,6 +629,16 @@ namespace DataAccess.Data.Migrations
                         .HasForeignKey("Location")
                         .HasConstraintName("FK_Team_Loc")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("DataAccess.Model.ThrottledRequest", b =>
+                {
+                    b.HasOne("DataAccess.Model.Team", "Team")
+                        .WithMany("ThrottledRequests")
+                        .HasForeignKey("TeamId")
+                        .HasConstraintName("FK__TRreq__Team")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DataAccess.Model.User", b =>

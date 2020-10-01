@@ -9,20 +9,25 @@ namespace DataAccess.Data
 {
     public class DataContext : DbContext
     {
-        public DbSet<FutureGame> FutureGames { get; set; }
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Guess> Guesses { get; set; }
-        public DbSet<Kill> Kills { get; set; }
-        public DbSet<Location> Locations { get; set; }
-        public DbSet<Participant> Participants { get; set; }
-        public DbSet<Phase> Phases { get; set; }
-        public DbSet<Request> Requests { get; set; }
-        public DbSet<Round> Rounds { get; set; }
-        public DbSet<RoundConfig> RoundConfigs { get; set; }
-        public DbSet<Score> Scores { get; set; }
-        public DbSet<Team> Teams { get; set; }
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<FutureGame> FutureGames { get; set; }
+        public virtual DbSet<Game> Games { get; set; }
+        public virtual DbSet<Guess> Guesses { get; set; }
+        public virtual DbSet<Kill> Kills { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<Participant> Participants { get; set; }
+        public virtual DbSet<Phase> Phases { get; set; }
+        public virtual DbSet<Request> Requests { get; set; }
+        public virtual DbSet<Round> Rounds { get; set; }
+        public virtual DbSet<RoundConfig> RoundConfigs { get; set; }
+        public virtual DbSet<Score> Scores { get; set; }
+        public virtual DbSet<Team> Teams { get; set; }
+        public virtual DbSet<ThrottledRequest> ThrottledRequests { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
+        public DataContext()
+        {
+
+        }
         private const string TIMESTAMP_TYPE = "timestamp with time zone";
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
@@ -150,6 +155,8 @@ namespace DataAccess.Data
 
                 entity.Property(p => p.TeamId).IsRequired().HasMaxLength(20);
 
+                entity.Property(p => p.Secret).IsRequired();
+
                 entity.Property(p => p.IsAlive).IsRequired().HasDefaultValue(true);
 
                 entity.Property(guess => guess.JoinedAt).IsRequired().HasColumnType(TIMESTAMP_TYPE);
@@ -204,15 +211,19 @@ namespace DataAccess.Data
 
                 entity.HasKey(req => req.RequestId);
 
-                entity.Property(req => req.RequestApi).HasConversion(
-                    type => type.ToString(), // code to db
-                    type => (RequestApi)Enum.Parse(typeof(RequestApi), type) // db to code
-                ).IsRequired();
+                //entity.Property(req => req.RequestApi).HasConversion(
+                //    type => type.ToString(), // code to db
+                //    type => (RequestApi)Enum.Parse(typeof(RequestApi), type) // db to code
+                //).IsRequired();
+
+                entity.Property(req => req.RequestApi).IsRequired();
 
                 entity.Property(req => req.RequestMethod).HasConversion(
                     type => type.ToString(), // code to db
                     type => (RequestMethod)Enum.Parse(typeof(RequestMethod), type) // db to code
                 ).IsRequired();
+
+                entity.Property(req => req.StatusCode).IsRequired();
 
                 entity.Property(req => req.GameId).HasDefaultValue(null);
                 entity.Property(req => req.RoundId).HasDefaultValue(null);
@@ -322,6 +333,18 @@ namespace DataAccess.Data
                       .HasConstraintName("FK_Team_Loc");
 
                 entity.Property(loc => loc.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<ThrottledRequest>(entity =>
+            {
+                entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.HasKey(t => t.HitId);
+                entity.Property(t => t.TeamId).HasMaxLength(20).IsRequired();
+                entity.Property(t => t.LastHit).HasColumnType(TIMESTAMP_TYPE);
+
+                entity.HasOne(t => t.Team).WithMany(t => t.ThrottledRequests)
+                    .HasForeignKey(t => t.TeamId)
+                    .HasConstraintName("FK__TRreq__Team");
             });
 
             modelBuilder.Entity<User>(entity => 

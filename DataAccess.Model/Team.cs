@@ -12,7 +12,7 @@ namespace DataAccess.Model
             KillRecord = new HashSet<Kill>();
             DeathRecord = new HashSet<Kill>();
             ParticipationRecord = new HashSet<Participant>();
-
+            ThrottledRequests = new HashSet<ThrottledRequest>();
             Guesses = new HashSet<Guess>();
             Scores = new HashSet<Score>();
             Requests = new HashSet<Request>();
@@ -32,5 +32,6 @@ namespace DataAccess.Model
         public ICollection<Guess> Guesses { get; set; }
         public ICollection<Score> Scores { get; set; }
         public ICollection<Request> Requests { get; set; }
+        public ICollection<ThrottledRequest> ThrottledRequests { get; set; }
     }
 }

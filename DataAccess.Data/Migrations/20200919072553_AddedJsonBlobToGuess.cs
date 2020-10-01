@@ -7,13 +7,13 @@ namespace DataAccess.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<GuessRequest>(
+            migrationBuilder.AddColumn<GuessRequestBody>(
                 name: "GuessRequest",
                 table: "Guesses",
                 type: "jsonb",
                 nullable: true);
 
-            migrationBuilder.AddColumn<GuessResponse>(
+            migrationBuilder.AddColumn<GuessResponseBody>(
                 name: "GuessResponse",
                 table: "Guesses",
                 type: "jsonb",

@@ -10,8 +10,8 @@ namespace DataAccess.Model
         public Guid GameId { get; set; }
         public Guid RoundId { get; set; }
         public string TeamId { get; set; }
-        public GuessRequest GuessRequest { get; set; }
-        public GuessResponse GuessResponse { get; set; }
+        public GuessRequestBody GuessRequest { get; set; }
+        public GuessResponseBody GuessResponse { get; set; }
         public DateTime TimeStamp { get; set; }
         public Game Game { get; set; }
         public Round Round { get; set; }
