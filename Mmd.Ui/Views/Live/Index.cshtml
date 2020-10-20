@@ -1,0 +1,111 @@
+﻿@model LiveViewModel
+@{ Layout = "_Layout"; ViewBag.Title = "Live";}
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6" style="padding: 20px;">
+            <h5 class="text-center">Current Round Score</h5>
+            <div style="box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 5px; padding: 10px">
+                <h6 class="text-center">Round : @Model.RoundNumber | SecretLength : @Model.SecretLength | Status : @Model.Status</h6>
+                <div class="row" style="padding: 10px;  background-color: black; color:white">
+
+                    <div class="col-1" style="padding-left: 1px">Rank</div>
+                    <div class="col-2 text-center">Team</div>
+                    <div class="col-3 text-center">Location</div>
+                    <div class="col-2 text-center">Score</div>
+                    <div class="col-2 text-center">Lifelines</div>
+                    <div class="col-2 text-center">Status</div>
+
+                </div>
+                @for (var i = 0; i < Model.Participants_CurrentScore.Count; i++)
+                {
+            <div class="row" style="padding: 10px">
+                <div class="col-1 text-center" style="padding:10px">@(i+1)</div>
+                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].TeamId</div>
+                <div class="col-3 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].Location</div>
+                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].CurrentScore</div>
+                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].Lifelines</div>
+                @if (Model.Participants_CurrentScore[i].IsAlive == false)
+                {
+                    <div class="col-2 text-center">
+                        <img style="height:45px; width:40px;" src="~/img/dead.jpg" alt="dead" />
+                    </div>
+                }
+                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Joining"))
+                {
+                    <div class="col-2 text-center" style="color:green; padding:10px; height: 45px">Joined</div>
+                }
+                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Running"))
+                {
+                    <div class="col-2 text-center">
+                        <img style="height:45px; width:60px" src="~/img/ninja.gif" alt="fighting..." />
+                    </div>  
+
+                }
+                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Finished"))
+                {
+                    <div class="col-2 text-center" style="color:green; padding:10px; height: 45px">Survived</div>
+                }
+            </div>
+
+                }
+            </div>
+        </div>
+
+
+        <div class="col-lg-6" style="padding: 20px;">
+            <h5 class="text-center">Total Score</h5>
+            <div style="box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 5px; padding: 10px">
+                <h6 class="text-center">GameID : @Model.GameId</h6>
+                <div class="row" style=" padding: 10px; background-color: black; color:white">
+
+                    <div class="col-1" style="padding-left: 1px">Rank</div>
+                    <div class="col-3 text-center">Team</div>
+                    <div class="col-4 text-center">Location</div>
+                    <div class="col-2 text-center">Score</div>
+                    <div class="col-2 text-center"></div>
+
+                </div>
+                @for (var i = 0; i < Model.Participants_TotalScore.Count; i++)
+                {
+                    <div class="row" style="padding: 10px">
+                        <div class="col-1 text-center" style="padding:10px; height:45px;">@(i+1)</div>
+                        <div class="col-3 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].TeamId</div>
+                        <div class="col-4 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].Location</div>
+                        <div class="col-2 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].TotalScore</div>
+                        @if (Model.RoundNumber == 10)
+                        {
+                            if (i == 0)
+                            {
+                                <div class="col-2">
+                                    <img src="~/img/gold.png" style="height:45px; width:35px;" alt="Gold Medal" />
+                                </div>
+                            }
+                            if (i == 1)
+                            {
+                                <div class="col-2">
+                                    <img src="~/img/silver.png" style="height:45px; width:35px;" alt="Silver Medal" />
+                                </div>
+                            }
+                            if (i == 2)
+                            {
+                                <div class="col-2">
+                                    <img src="~/img/bronze.png" style="height:45px; width:35px;" alt="Bronze Medal" />
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        setTimeout("window.location.reload();", 5000);
+    </script>
+}
