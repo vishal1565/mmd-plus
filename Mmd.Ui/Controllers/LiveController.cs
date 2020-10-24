@@ -18,7 +18,7 @@ namespace mmd_plus.Controllers
 {
     public class LiveController : Controller
     {
-       
+
         private readonly ILiveService _liveService;
 
         public LiveController(ILiveService liveService)
@@ -26,11 +26,8 @@ namespace mmd_plus.Controllers
             _liveService = liveService;
         }
 
-        public async Task<IActionResult> IndexAsync()
-        {
-            LiveResponse liveResponse = await _liveService.GetLiveStatus();
-
-            LiveViewModel live = new LiveViewModel
+        public LiveViewModel getLiveViewModel(LiveResponse liveResponse) { 
+            return new LiveViewModel
             {
                 GameId = liveResponse.GameId,
                 RoundId = liveResponse.RoundId,
@@ -41,12 +38,34 @@ namespace mmd_plus.Controllers
                 Participants_TotalScore = liveResponse.Participants.OrderByDescending(o => o.TotalScore).ToList()
 
             };
-
-            return View(live);
-      
         }
+
+        public IActionResult Index()
+        {
+
+            return View();
+
+        }
+        /*public async Task<IActionResult> IndexAsync()
+        {
+
             
-            
-        
+            LiveResponse liveResponse = await _liveService.GetLiveStatus();
+           
+            return View(getLiveViewModel(liveResponse));
+
+        }
+        */
+
+
+        public async Task<IActionResult> LoadData() {
+            LiveResponse liveResponse = await _liveService.GetLiveStatus();
+
+            return Json(getLiveViewModel(liveResponse));
+
+        }
+
+
+
     }
 }

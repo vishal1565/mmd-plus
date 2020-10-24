@@ -1,111 +1,332 @@
 ﻿@model LiveViewModel
 @{ Layout = "_Layout"; ViewBag.Title = "Live";}
 
-<div class="container">
+<div id="start" class="container">
 
-    <div class="row justify-content-center">
+    <div id="refresh" class="row justify-content-center">
 
-        <div class="col-lg-6" style="padding: 20px;">
-            <h5 class="text-center">Current Round Score</h5>
-            <div style="box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 5px; padding: 10px">
-                <h6 class="text-center">Round : @Model.RoundNumber | SecretLength : @Model.SecretLength | Status : @Model.Status</h6>
-                <div class="row" style="padding: 10px;  background-color: black; color:white">
-
-                    <div class="col-1" style="padding-left: 1px">Rank</div>
-                    <div class="col-2 text-center">Team</div>
-                    <div class="col-3 text-center">Location</div>
-                    <div class="col-2 text-center">Score</div>
-                    <div class="col-2 text-center">Lifelines</div>
-                    <div class="col-2 text-center">Status</div>
-
-                </div>
-                @for (var i = 0; i < Model.Participants_CurrentScore.Count; i++)
-                {
-            <div class="row" style="padding: 10px">
-                <div class="col-1 text-center" style="padding:10px">@(i+1)</div>
-                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].TeamId</div>
-                <div class="col-3 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].Location</div>
-                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].CurrentScore</div>
-                <div class="col-2 text-center" style="padding:10px">@Model.Participants_CurrentScore[i].Lifelines</div>
-                @if (Model.Participants_CurrentScore[i].IsAlive == false)
-                {
-                    <div class="col-2 text-center">
-                        <img style="height:45px; width:40px;" src="~/img/dead.jpg" alt="dead" />
-                    </div>
-                }
-                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Joining"))
-                {
-                    <div class="col-2 text-center" style="color:green; padding:10px; height: 45px">Joined</div>
-                }
-                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Running"))
-                {
-                    <div class="col-2 text-center">
-                        <img style="height:45px; width:60px" src="~/img/ninja.gif" alt="fighting..." />
-                    </div>  
-
-                }
-                else if (Model.Participants_CurrentScore[i].IsAlive == true && Model.Status.Equals("Finished"))
-                {
-                    <div class="col-2 text-center" style="color:green; padding:10px; height: 45px">Survived</div>
-                }
-            </div>
-
-                }
+        <div class="col-lg-6" style="padding: 10px;">
+            <h5 class="text-center">Current Score</h5>
+            <h6 id="currentStatus" class="text-center">Round :  | SecretLength : | Status : </h6>
+            <table id="current" class="table row-border no-footer" style="width:100%;">
+                <thead>
+                    <tr style="background-color:black; color:white; height:45px;">
+                        <th style="font-size:12px">Rank</th>
+                        <th style="font-size:12px">Team</th>
+                        <th style="font-size:12px">Location</th>
+                        <th style="font-size:12px">Score</th>
+                        <th style="font-size:12px">Lifelines</th>
+                        <th style="font-size:12px">Status</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="loadingDiv" style="height:70vh">
+                <img class="loadingSpinner" src='img/loading.gif' alt='loading' />
             </div>
         </div>
 
 
-        <div class="col-lg-6" style="padding: 20px;">
+        <div class="col-lg-6" style="padding: 10px;">
             <h5 class="text-center">Total Score</h5>
-            <div style="box-shadow: rgba(0, 0, 0, 0.3) 5px 5px 5px; padding: 10px">
-                <h6 class="text-center">GameID : @Model.GameId</h6>
-                <div class="row" style=" padding: 10px; background-color: black; color:white">
-
-                    <div class="col-1" style="padding-left: 1px">Rank</div>
-                    <div class="col-3 text-center">Team</div>
-                    <div class="col-4 text-center">Location</div>
-                    <div class="col-2 text-center">Score</div>
-                    <div class="col-2 text-center"></div>
-
-                </div>
-                @for (var i = 0; i < Model.Participants_TotalScore.Count; i++)
-                {
-                    <div class="row" style="padding: 10px">
-                        <div class="col-1 text-center" style="padding:10px; height:45px;">@(i+1)</div>
-                        <div class="col-3 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].TeamId</div>
-                        <div class="col-4 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].Location</div>
-                        <div class="col-2 text-center" style="padding:10px; height:45px;">@Model.Participants_TotalScore[i].TotalScore</div>
-                        @if (Model.RoundNumber == 10)
-                        {
-                            if (i == 0)
-                            {
-                                <div class="col-2">
-                                    <img src="~/img/gold.png" style="height:45px; width:35px;" alt="Gold Medal" />
-                                </div>
-                            }
-                            if (i == 1)
-                            {
-                                <div class="col-2">
-                                    <img src="~/img/silver.png" style="height:45px; width:35px;" alt="Silver Medal" />
-                                </div>
-                            }
-                            if (i == 2)
-                            {
-                                <div class="col-2">
-                                    <img src="~/img/bronze.png" style="height:45px; width:35px;" alt="Bronze Medal" />
-                                </div>
-                            }
-                        }
-                    </div>
-                }
+            <h6 id="totalStatus" class="text-center">GameID : </h6>
+            <table id="total" class="table row-border no-footer" style="width:100%;">
+                <thead>
+                    <tr style="background-color:black; color:white; height:45px;">
+                        <th style="font-size:12px">Rank</th>
+                        <th style="font-size:12px">Team</th>
+                        <th style="font-size:12px">Location</th>
+                        <th style="font-size:12px">Score</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="loadingDiv" style="height:70vh">
+                <img class="loadingSpinner" src='img/loading.gif'  alt='loading' />
             </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts
 {
-    <script>
-        setTimeout("window.location.reload();", 5000);
+    <script type="text/javascript">
+
+        var currentTable;
+        var totalTable;
+
+        function countryFlags(country) {
+            var country_code = ""
+
+            switch (country) {
+                case 'India-Pune':
+                case 'India-Bangalore':
+                case 'India-Mumbai':
+                case 'India-Jaipur':
+                    country_code = 'in';
+                    break;
+
+                case 'UK-London':
+                case 'UK-Birmingham':
+                    country_code = 'gb';
+                    break;
+
+                case 'Germany':
+                    country_code = 'de';
+                    break;
+
+                case 'USA-New York':
+                case 'USA-Cary':
+                    country_code = 'us';
+                    break;
+
+                case 'Singapore':
+                    country_code = 'sg';
+                    break;
+
+                case 'Russia-Moscow':
+                case 'Russia-St. Petersburg':
+                    country_code = 'ru';
+                    break;
+
+                case 'Hong Kong':
+                    country_code = 'hk';
+                    break;
+
+                case 'Australia-Sydney':
+                case 'Australia-Melbourne':
+                    country_code = 'au';
+                    break;
+
+                case 'Japan-Tokyo':
+                    country_code = 'jp';
+                    break;
+
+                case 'Malaysia':
+                    country_code = 'my';
+                    break;
+
+                case 'Italy':
+                    country_code = 'it';
+                    break;
+
+                case 'Switzerland':
+                    country_code = 'ch';
+                    break;
+
+                case 'Canada':
+                    country_code = 'ca';
+                    break;
+
+                case 'Vietnam':
+                    country_code = 'vn';
+                    break;
+
+                case 'Ireland':
+                    country_code = 'ie';
+                    break;
+
+                case 'Romania':
+                    country_code = 'ro';
+                    break;
+                default:
+                    return "Other";
+            }
+
+            return country_code;
+
+        }
+
+        function generateTables() {
+
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadData","Live")',
+                dataType: 'json',
+                data: {},
+                beforeSend: function () {
+                    if (typeof totalTable === 'undefined') {
+                        $('.loadingDiv').show()
+                    }
+                },
+                success: function (data) {
+
+                    console.log(data);
+
+                    var roundNumber = data.roundNumber;
+                    var isRobot = data.isRobot;
+                    var roundPhase = data.status;
+
+                    $('#totalStatus').html("GameID : " + data.gameId)
+
+                    $('#currentStatus').html("Round : " + data.roundNumber + " | SecretLength : " + data.secretLength + " | Status : " + data.status)
+
+                  
+                        if (typeof totalTable === 'undefined') {
+
+                            $('.loadingDiv').hide()
+
+                        totalTable = $('#total').DataTable({
+                            "data": data.participants_TotalScore,
+                            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                                $("td:first", nRow).html(iDisplayIndex + 1);
+                                return nRow;
+                            },
+                            "fixedHeader": true,
+                            "scrollY": "70vh",
+                            "scrollX": true,
+                            "fixedColumns": false,
+                            "sDom": 't',
+                            "order": [],
+                            "columnDefs": [{ targets: "_all", orderable: false, className: 'dt-center' }],
+                            "columns": [
+                                { data: null },
+                                {
+                                    data: "teamId",
+                                    render: function (data) { return data.toUpperCase(); }
+                                },
+                                {
+                                    data: "location",
+                                    render: function (data, type) {
+
+                                        if (isRobot) {
+                                            return '<img src="img/robot.jpg" alt="Robot" />'
+                                        }
+
+                                        var country = countryFlags(data);
+
+                                        if (data == 'Other' || country == 'Other') {
+                                            return "Other"
+                                        }
+
+                                        var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
+
+                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
+                                    }
+                                },
+                                { data: "totalScore" },
+                                {
+                                    render: function (data, type, row, meta) {
+                                        if (meta.row == 0 && roundNumber == 10) {
+                                            return '<img src="img/gold.png" style="height:45px; width:35px;" alt="Silver Medal"/>';
+
+                                        }
+
+                                        if (meta.row == 1 && roundNumber == 10) {
+                                            return '<img src="img/silver.png" style="height:45px; width:35px;" alt="Silver Medal" />';
+                                        }
+
+                                        if (meta.row == 2 && roundNumber == 10) {
+                                            return '<img src="img/bronze.png" style="height:45px; width:35px;" alt="Bronze Medal" />';
+                                        }
+
+                                        return "";
+                                    }
+                                }
+                            ]
+
+                        })
+                    }
+                    else {
+                        totalTable.clear().rows.add(data.participants_TotalScore).draw();
+                    }
+
+                    if (typeof currentTable === 'undefined') {
+
+                        currentTable = $('#current').DataTable({
+                            "data": data.participants_CurrentScore,
+                            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                                $("td:first", nRow).html(iDisplayIndex + 1);
+                                return nRow;
+                            },
+                            "fixedHeader": true,
+                            "scrollY": "70vh",
+                            "scrollX": true,
+                            "fixedColumns": false,
+                            "sDom": 't',
+                            "order": [],
+                            "columnDefs": [{ targets: "_all", orderable: false, className: 'dt-center' }],
+                            "columns": [
+                                { data: null },
+                                {
+                                    data: "teamId",
+                                    render: function (data) { return data.toUpperCase(); }
+
+                                },
+                                {
+                                    data: "location",
+                                    render: function (data) {
+
+                                        if (isRobot) {
+                                            return '<imdg src="img/robot.jpg" alt="Robot" />'
+                                        }
+
+                                        var country = countryFlags(data);
+
+                                        if (data == 'Other' || country == 'Other') {
+                                            return "Other"
+                                        }
+                                        var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
+
+                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
+                                    }
+                                },
+                                { data: "currentScore" },
+                                { data: "lifelines" },
+                                {
+                                    data: "isAlive",
+                                    render: function (data, type, row, meta) {
+                                        if (!data) {
+                                            return '<img style="height:35px; width:30px;" src="img/dead.jpg" alt="dead" />'
+                                        }
+                                        if (data && roundPhase == "Joining") {
+                                            return '<span style="color: green;">Joined</span>';
+                                        }
+                                        if (data && roundPhase == "Running") {
+                                            return '<img style="height:45px; width:65px;" src="img/ninja.gif" alt="fighting..." />'
+
+                                        }
+                                        if (data && roundPhase == "Finished") {
+                                            return '<span style="color: green;">Survived</span>';
+                                        }
+
+                                        return "";
+                                    }
+
+                                },
+                            ],
+
+                        })
+                    }
+                    else {
+                        currentTable.clear().rows.add(data.participants_CurrentScore).draw();
+                    }
+
+                },
+                error: {}
+            });
+
+        }
+
+
+
+        function noDelaySetInterval(func, interval) {
+            func();
+            return setInterval(func, interval);
+        }
+
+        function startSetInterval() {
+            noDelaySetInterval(generateTables, 5000);
+        } 
+
+
+        $(document).ready(function () {
+
+            startSetInterval();
+            
+            });
+
+
+
     </script>
 }
