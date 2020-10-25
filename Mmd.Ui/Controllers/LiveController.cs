@@ -65,6 +65,14 @@ namespace mmd_plus.Controllers
 
         }
 
+        public async Task<IActionResult> LoadHeader()
+        {
+            LiveHeader liveHeader = await _liveService.GetHeader();
+
+            return Json(liveHeader);
+
+        }
+
 
 
     }

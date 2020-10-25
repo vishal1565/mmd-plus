@@ -54,6 +54,8 @@
 
         var currentTable;
         var totalTable;
+        var minsLeft;
+        var secsLeft;
 
         function countryFlags(country) {
             var country_code = ""
@@ -137,6 +139,74 @@
 
         }
 
+        function getTimeRemaining(phaseStartTime, totalPhaseTime) {
+
+            const timeElapsed = Date.parse(new Date()) - Date.parse(phaseStartTime)
+            const timeLeft = (totalPhaseTime*1000) - timeElapsed
+            const seconds = Math.floor((timeLeft / 1000) % 60);
+            const minutes = Math.floor((timeLeft / 1000 / 60) % 60);
+
+            return {
+                timeLeft,
+                minutes,
+                seconds
+            };
+        }
+
+        function setHeader(data, totalPhaseTime) {
+
+            function updateClock() {
+                const t = getTimeRemaining(data.phaseStartTime, totalPhaseTime);
+                
+                if (t.timeLeft <= 0) {
+                    if (typeof timeinterval != 'undefined') { clearInterval(timeinterval); }
+                    t.minutes = 0;
+                    t.seconds = 0;
+                }
+
+                minsLeft = ('0' + t.minutes).slice(-2);
+                secsLeft = ('0' + t.seconds).slice(-2);
+
+                $('#totalStatus').html("GameID : " + data.gameId)
+
+                $('#currentStatus').html("Round : " + data.roundNumber + " | SecretLength : " + data.secretLength + " | Status : " + data.phase + " | " + minsLeft + ":" + secsLeft)
+               
+            }
+
+            updateClock();
+            var timeinterval = setInterval(updateClock, 1000);
+
+            
+        }
+
+        function generateLiveHeader() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadHeader","Live")',
+                dataType: 'json',
+                data: {},
+                success: function (data) {
+
+                    var totalPhaseTime
+
+                    if (data.phase == "Joining") {
+                        totalPhaseTime = data.joiningDuration
+                    }
+
+                    else if (data.phase == "Running") {
+                        totalPhaseTime = data.runningDuration
+                    }
+
+                    else {
+                        totalPhaseTime = data.finishedDuration
+                    }
+
+                    setHeader(data, totalPhaseTime);
+                },
+                error: {}
+            });
+        }
+
         function generateTables() {
 
             $.ajax({
@@ -151,20 +221,13 @@
                 },
                 success: function (data) {
 
-                    console.log(data);
-
                     var roundNumber = data.roundNumber;
                     var isRobot = data.isRobot;
                     var roundPhase = data.status;
 
-                    $('#totalStatus').html("GameID : " + data.gameId)
+                    if (typeof totalTable === 'undefined') {
 
-                    $('#currentStatus').html("Round : " + data.roundNumber + " | SecretLength : " + data.secretLength + " | Status : " + data.status)
-
-                  
-                        if (typeof totalTable === 'undefined') {
-
-                            $('.loadingDiv').hide()
+                        $('.loadingDiv').hide()
 
                         totalTable = $('#total').DataTable({
                             "data": data.participants_TotalScore,
@@ -316,14 +379,15 @@
         }
 
         function startSetInterval() {
+            noDelaySetInterval(generateLiveHeader, 5000);
             noDelaySetInterval(generateTables, 5000);
-        } 
+        }
 
 
         $(document).ready(function () {
 
             startSetInterval();
-            
+
             });
 
 
