@@ -26,30 +26,6 @@ namespace DataAccess.Data.Services
             _logger = logger ?? throw new ArgumentNullException("DataContext");
         }
 
-        public virtual async Task<LiveHeader> GetHeader()
-        {
-            LiveHeader response = new LiveHeader();
-            var currentPhase = await _context.Phases.Include(p => p.Round).OrderByDescending(p => p.TimeStamp).FirstOrDefaultAsync();
-            if (currentPhase == null)
-            {
-                _logger.LogError("Error : Game not running");
-            }
-            else {
-                var roundConfig = await _context.RoundConfigs.Where(rc => rc.Id == currentPhase.Round.RoundNumber).SingleOrDefaultAsync();
-
-                response.RoundId = currentPhase.Round.RoundId;
-                response.GameId = currentPhase.Round.GameId;
-                response.RoundNumber = currentPhase.Round.RoundNumber;
-                response.SecretLength = roundConfig.SecretLength;
-                response.Phase = currentPhase.PhaseType.ToString();
-                response.JoiningDuration = roundConfig.JoiningDuration;
-                response.RunningDuration = roundConfig.RunningDuration;
-                response.FinishedDuration = roundConfig.FinishedDuration;
-                response.PhaseStartTime = currentPhase.TimeStamp;
-            }
-            return response;
-        }
-
         public virtual async Task<LiveResponse> GetLiveStatus() {
 
             try
@@ -125,7 +101,11 @@ namespace DataAccess.Data.Services
                     response.RoundNumber = currentPhase.Round.RoundNumber;
                     response.SecretLength = roundConfig?.SecretLength;
                     response.Participants = participantsList;
-                    response.Status = currentPhase.PhaseType.ToString();
+                    response.Phase = currentPhase.PhaseType.ToString();
+                    response.JoiningDuration = roundConfig.JoiningDuration;
+                    response.RunningDuration = roundConfig.RunningDuration;
+                    response.FinishedDuration = roundConfig.FinishedDuration;
+                    response.PhaseStartTime = currentPhase.TimeStamp;
 
                 }
                 return response;

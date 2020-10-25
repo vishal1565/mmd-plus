@@ -179,34 +179,7 @@
             
         }
 
-        function generateLiveHeader() {
-            $.ajax({
-                type: 'GET',
-                url: '@Url.Action("LoadHeader","Live")',
-                dataType: 'json',
-                data: {},
-                success: function (data) {
-
-                    var totalPhaseTime
-
-                    if (data.phase == "Joining") {
-                        totalPhaseTime = data.joiningDuration
-                    }
-
-                    else if (data.phase == "Running") {
-                        totalPhaseTime = data.runningDuration
-                    }
-
-                    else {
-                        totalPhaseTime = data.finishedDuration
-                    }
-
-                    setHeader(data, totalPhaseTime);
-                },
-                error: {}
-            });
-        }
-
+       
         function generateTables() {
 
             $.ajax({
@@ -224,6 +197,22 @@
                     var roundNumber = data.roundNumber;
                     var isRobot = data.isRobot;
                     var roundPhase = data.status;
+
+                    var totalPhaseTime;
+
+                    if (data.phase == "Joining") {
+                        totalPhaseTime = data.joiningDuration
+                    }
+
+                    else if (data.phase == "Running") {
+                        totalPhaseTime = data.runningDuration
+                    }
+
+                    else {
+                        totalPhaseTime = data.finishedDuration
+                    }
+
+                    setHeader(data, totalPhaseTime);
 
                     if (typeof totalTable === 'undefined') {
 
@@ -379,7 +368,6 @@
         }
 
         function startSetInterval() {
-            noDelaySetInterval(generateLiveHeader, 5000);
             noDelaySetInterval(generateTables, 5000);
         }
 

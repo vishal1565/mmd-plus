@@ -32,8 +32,12 @@ namespace mmd_plus.Controllers
                 GameId = liveResponse.GameId,
                 RoundId = liveResponse.RoundId,
                 RoundNumber = liveResponse.RoundNumber,
-                Status = liveResponse.Status,
+                Phase = liveResponse.Phase,
                 SecretLength = liveResponse.SecretLength,
+                JoiningDuration = liveResponse.JoiningDuration,
+                RunningDuration = liveResponse.RunningDuration,
+                FinishedDuration = liveResponse.FinishedDuration,
+                PhaseStartTime = liveResponse.PhaseStartTime,
                 Participants_CurrentScore = liveResponse.Participants.OrderByDescending(o => o.CurrentScore).ToList(),
                 Participants_TotalScore = liveResponse.Participants.OrderByDescending(o => o.TotalScore).ToList()
 
@@ -46,17 +50,7 @@ namespace mmd_plus.Controllers
             return View();
 
         }
-        /*public async Task<IActionResult> IndexAsync()
-        {
-
-            
-            LiveResponse liveResponse = await _liveService.GetLiveStatus();
-           
-            return View(getLiveViewModel(liveResponse));
-
-        }
-        */
-
+       
 
         public async Task<IActionResult> LoadData() {
             LiveResponse liveResponse = await _liveService.GetLiveStatus();
@@ -64,16 +58,6 @@ namespace mmd_plus.Controllers
             return Json(getLiveViewModel(liveResponse));
 
         }
-
-        public async Task<IActionResult> LoadHeader()
-        {
-            LiveHeader liveHeader = await _liveService.GetHeader();
-
-            return Json(liveHeader);
-
-        }
-
-
 
     }
 }

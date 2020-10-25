@@ -10,7 +10,6 @@ namespace DataAccess.Data.Abstract
     public interface ILiveService
     {
         public Task<LiveResponse> GetLiveStatus();
-        public Task<LiveHeader> GetHeader();
 
     }
 }
