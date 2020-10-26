@@ -48,6 +48,7 @@ namespace mmd_plus
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IRegistrationService, RegistrationService>();
+            services.AddScoped<ILiveService, LiveService>();
 
             services.AddScoped<EmailNotificationService>();
 

@@ -78,7 +78,7 @@ namespace GameApi.Service
             });
             
             services.AddControllers().AddNewtonsoftJson();
-            
+
             string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContext<DataContext>(options =>
             {
