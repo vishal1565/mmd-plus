@@ -1,4 +1,8 @@
-﻿namespace DataAccess.Model.SharedModels
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DataAccess.Model.SharedModels
 {
     public class LiveParticipantDetails
     {
@@ -9,6 +13,12 @@
         public bool IsRobot { get; set; }
         public string Location { get; set; }
         public int Lifelines { get; set; }
+
+        public Guid? GameId { get; set; }
+        public Guid? RoundId { get; set; }
+        public long? RoundNumber { get; set; }
+        public string Phase { get; set; }
+
 
     }
 }

@@ -91,7 +91,11 @@ namespace DataAccess.Data.Services
                             IsAlive = participants[key].IsAlive,
                             IsRobot = participants[key].Team.IsRobot,
                             Location = participants[key].Team.Location,
-                            Lifelines = zeroLifelines ? 0 : LifelinesRemaining
+                            Lifelines = zeroLifelines ? 0 : LifelinesRemaining,
+                            RoundId = currentPhase.Round.RoundId,
+                            GameId = currentPhase.Round.GameId,
+                            RoundNumber = currentPhase.Round.RoundNumber,
+                            Phase = currentPhase.PhaseType.ToString()
                         }) ;
                     }
 
