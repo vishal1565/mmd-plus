@@ -1,4 +1,4 @@
-﻿@model LiveViewModel
+@model LiveViewModel
 @{ Layout = "_Layout"; ViewBag.Title = "Live";}
 
 <div id="start" class="container">
@@ -52,10 +52,7 @@
 {
     <script type="text/javascript">
 
-        var currentTable;
-        var totalTable;
-        var minsLeft;
-        var secsLeft;
+        var currentTable, totalTable, minsLeft, secsLeft
 
         function countryFlags(country) {
             var country_code = ""
@@ -194,11 +191,6 @@
                 },
                 success: function (data) {
 
-                    console.log(data)
-
-                    var roundNumber = data.roundNumber;
-                    var roundPhase = data.phase;
-
                     var totalPhaseTime;
 
                     if (data.phase == "Joining") {
@@ -214,8 +206,6 @@
                     }
 
                     setHeader(data, totalPhaseTime);
-
-                    
 
                     if (typeof totalTable === 'undefined') {
 
@@ -247,26 +237,27 @@
                                     render: function (data) { return data.toUpperCase(); }
                                 },
                                 {
-                                    data: function (row, type) {
+                                    data: "location",
+                                    render: function (data, type, row, meta) {
                                         if (row.isRobot)
                                             return '<img src="img/robot.jpg" style="height:30px; width:35px;margin-top:-3px;" alt="Robot" />Robot'
 
-                                        var country = countryFlags(row.location);
+                                        var country = countryFlags(data);
 
-                                        if (row.location == 'Other' || country == 'Other') {
+                                        if (data == 'Other' || country == 'Other') {
                                             return "Other"
                                         }
 
                                         var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
 
-                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + row.location
+                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
 
                                     }
                                 },
-                                { data: "totalScore" },
+                                { data: "score" },
                                 {
                                     render: function (data, type, row, meta) {
-                                        if (meta.row == 0 && row.roundNumber == 1) {
+                                        if (meta.row == 0 && row.roundNumber == 10) {
                                             return '<img src="img/gold.png" style="height:45px; width:35px;" alt="Silver Medal"/>';
 
                                         }
@@ -290,6 +281,7 @@
                         totalTable.clear().rows.add(data.participants_TotalScore).draw();
                     }
 
+
                     if (typeof currentTable === 'undefined') {
 
                         currentTable = $('#current').DataTable({
@@ -305,11 +297,9 @@
                             "sDom": 't',
                             "order": [],
                             "columnDefs": [
-
                                 {
-                                    "targets": [1, 2], // your case first column
-                                    "className": "text-left",
-                                    //"width": "4%"
+                                    "targets": [1, 2], 
+                                    "className": "text-left"
                                 },
                                 { targets: "_all", orderable: false, className: 'dt-center' }
                             ],
@@ -321,23 +311,24 @@
 
                                 },
                                 {
-                                    data: function (row, type) {
+                                    data: "location",
+                                    render: function (data,type, row,meta) {
                                         if (row.isRobot)
                                             return '<img src="img/robot.jpg" style="height:30px; width:35px;margin-top:-3px;" alt="Robot" />Robot'
 
-                                        var country = countryFlags(row.location);
+                                        var country = countryFlags(data);
 
-                                        if (row.location == 'Other' || country == 'Other') {
+                                        if (data == 'Other' || country == 'Other') {
                                             return "Other"
                                         }
 
                                         var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
 
-                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + row.location
+                                        return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
 
                                     }
                                 },
-                                { data: "currentScore" },
+                                { data: "score" },
                                 { data: "lifelines" },
                                 {
                                     data: "isAlive",
@@ -350,15 +341,12 @@
                                         else { 
 
                                             if (data && row.phase == "Joining") {
-                                                console.log("----Deciding if it is joning phase " + row.phase)
                                                 return '<span style="color: green;">JOINED</span>';
                                             }
                                             if (data && row.phase == "Running") {
-                                                console.log("----Deciding if it is running phase " + row.phase)
                                                 return '<img style="height:45px; width:65px;" src="img/ninja.gif" alt="fighting..." />'
                                             }
                                             if (data && row.phase == "Finished") {
-                                                console.log("----Deciding if it is finished phase " + row.phase)
                                                 return '<span style="color: green;">SURVIVED</span>';
                                             }
                                         }
