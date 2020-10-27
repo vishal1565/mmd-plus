@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,8 +38,8 @@ namespace mmd_plus.Controllers
                 RunningDuration = liveResponse.RunningDuration,
                 FinishedDuration = liveResponse.FinishedDuration,
                 PhaseStartTime = liveResponse.PhaseStartTime,
-                Participants_CurrentScore = liveResponse.Participants.OrderByDescending(o => o.CurrentScore).ToList(),
-                Participants_TotalScore = liveResponse.Participants.OrderByDescending(o => o.TotalScore).ToList()
+                Participants_CurrentScore = liveResponse.Participants_Current.OrderByDescending(o => o.Score).ToList(),
+                Participants_TotalScore = liveResponse.Participants_Total.OrderByDescending(o => o.Score).ToList()
 
             };
         }
