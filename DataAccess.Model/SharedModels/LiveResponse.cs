@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using DataAccess.Model;
@@ -26,6 +26,8 @@ namespace DataAccess.Model.SharedModels
         public long RunningDuration { get; set; }
         public long FinishedDuration { get; set; }
         public DateTime PhaseStartTime { get; set; }
-        public List<LiveParticipantDetails> Participants { get; set; }
+        public List<LiveParticipantDetails> Participants_Current { get; set; }
+        public List<LiveParticipantDetails> Participants_Total { get; set; }
+
     }
 }
