@@ -17,6 +17,7 @@ namespace DataAccess.Model.SharedModels
             IsAlive = null;
         }
 
+
         public string TeamId { get; set; }
         public long Score { get; set; }
         public bool? IsAlive { get; set; }

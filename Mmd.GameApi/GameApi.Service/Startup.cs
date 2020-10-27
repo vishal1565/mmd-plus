@@ -79,7 +79,8 @@ namespace GameApi.Service
             
             services.AddControllers().AddNewtonsoftJson();
 
-            string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+            string connectionString = "Server = localhost; Port = 5432; Database = codecomp; User ID = postgres; Password = codecompdb123;";
+            //string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseNpgsql(connectionString);
