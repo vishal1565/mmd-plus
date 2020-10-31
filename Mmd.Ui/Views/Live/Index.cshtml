@@ -1,4 +1,4 @@
-﻿@model LiveViewModel
+@model LiveViewModel
 @{ Layout = "_Layout"; ViewBag.Title = "Live";}
 
 <div id="start" class="container">
@@ -52,10 +52,7 @@
 {
     <script type="text/javascript">
 
-        var currentTable;
-        var totalTable;
-        var minsLeft;
-        var secsLeft;
+        var currentTable, totalTable, minsLeft, secsLeft
 
         function countryFlags(country) {
             var country_code = ""
@@ -194,10 +191,6 @@
                 },
                 success: function (data) {
 
-                    var roundNumber = data.roundNumber;
-                    var isRobot = data.isRobot;
-                    var roundPhase = data.phase;
-
                     var totalPhaseTime;
 
                     if (data.phase == "Joining") {
@@ -230,7 +223,13 @@
                             "fixedColumns": false,
                             "sDom": 't',
                             "order": [],
-                            "columnDefs": [{ targets: "_all", orderable: false, className: 'dt-center' }],
+                            "columnDefs": [
+                                {
+                                    "targets": [1,2],
+                                    "className": "text-left",
+                                },
+                                { targets: "_all", orderable: false, className: 'dt-center' }
+                            ],
                             "columns": [
                                 { data: null },
                                 {
@@ -239,11 +238,9 @@
                                 },
                                 {
                                     data: "location",
-                                    render: function (data, type) {
-
-                                        if (isRobot) {
-                                            return '<img src="img/robot.jpg" alt="Robot" />'
-                                        }
+                                    render: function (data, type, row, meta) {
+                                        if (row.isRobot)
+                                            return '<img src="img/robot.jpg" style="height:30px; width:35px;margin-top:-3px;" alt="Robot" />Robot'
 
                                         var country = countryFlags(data);
 
@@ -254,21 +251,22 @@
                                         var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
 
                                         return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
+
                                     }
                                 },
-                                { data: "totalScore" },
+                                { data: "score" },
                                 {
                                     render: function (data, type, row, meta) {
-                                        if (meta.row == 0 && roundNumber == 10) {
+                                        if (meta.row == 0 && row.roundNumber == 10) {
                                             return '<img src="img/gold.png" style="height:45px; width:35px;" alt="Silver Medal"/>';
 
                                         }
 
-                                        if (meta.row == 1 && roundNumber == 10) {
+                                        if (meta.row == 1 && row.roundNumber == 10) {
                                             return '<img src="img/silver.png" style="height:45px; width:35px;" alt="Silver Medal" />';
                                         }
 
-                                        if (meta.row == 2 && roundNumber == 10) {
+                                        if (meta.row == 2 && row.roundNumber == 10) {
                                             return '<img src="img/bronze.png" style="height:45px; width:35px;" alt="Bronze Medal" />';
                                         }
 
@@ -282,6 +280,7 @@
                     else {
                         totalTable.clear().rows.add(data.participants_TotalScore).draw();
                     }
+
 
                     if (typeof currentTable === 'undefined') {
 
@@ -297,7 +296,13 @@
                             "fixedColumns": false,
                             "sDom": 't',
                             "order": [],
-                            "columnDefs": [{ targets: "_all", orderable: false, className: 'dt-center' }],
+                            "columnDefs": [
+                                {
+                                    "targets": [1, 2], 
+                                    "className": "text-left"
+                                },
+                                { targets: "_all", orderable: false, className: 'dt-center' }
+                            ],
                             "columns": [
                                 { data: null },
                                 {
@@ -307,39 +312,43 @@
                                 },
                                 {
                                     data: "location",
-                                    render: function (data) {
-
-                                        if (isRobot) {
-                                            return '<imdg src="img/robot.jpg" alt="Robot" />'
-                                        }
+                                    render: function (data,type, row,meta) {
+                                        if (row.isRobot)
+                                            return '<img src="img/robot.jpg" style="height:30px; width:35px;margin-top:-3px;" alt="Robot" />Robot'
 
                                         var country = countryFlags(data);
 
                                         if (data == 'Other' || country == 'Other') {
                                             return "Other"
                                         }
+
                                         var flagSrc = "https://www.countryflags.io/" + country + "/shiny/32.png"
 
                                         return '<img src="' + flagSrc + '" alt="' + data + '" style="height:20px; width:20px;margin-top:-3px;" /> ' + data
+
                                     }
                                 },
-                                { data: "currentScore" },
+                                { data: "score" },
                                 { data: "lifelines" },
                                 {
                                     data: "isAlive",
                                     render: function (data, type, row, meta) {
-                                        if (!data) {
+
+                                        if (!data)
+                                        {
                                             return '<img style="height:35px; width:30px;" src="img/dead.jpg" alt="dead" />'
                                         }
-                                        if (data && roundPhase == "Joining") {
-                                            return '<span style="color: green;">Joined</span>';
-                                        }
-                                        if (data && roundPhase == "Running") {
-                                            return '<img style="height:45px; width:65px;" src="img/ninja.gif" alt="fighting..." />'
+                                        else { 
 
-                                        }
-                                        if (data && roundPhase == "Finished") {
-                                            return '<span style="color: green;">Survived</span>';
+                                            if (data && row.phase == "Joining") {
+                                                return '<span style="color: green;">JOINED</span>';
+                                            }
+                                            if (data && row.phase == "Running") {
+                                                return '<img style="height:45px; width:65px;" src="img/ninja.gif" alt="fighting..." />'
+                                            }
+                                            if (data && row.phase == "Finished") {
+                                                return '<span style="color: green;">SURVIVED</span>';
+                                            }
                                         }
 
                                         return "";

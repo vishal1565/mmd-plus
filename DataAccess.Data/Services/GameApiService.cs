@@ -75,11 +75,14 @@ namespace DataAccess.Data.Services
                     var participantsList = new List<TeamData>();
                     foreach(var key in participants.Keys)
                     {
+
+                        bool inScore = scores.ContainsKey(key);
+
                         participantsList.Add(new TeamData
                         {
                             TeamId = key,
-                            CurrentScore = scores[key].CurrentScore,
-                            TotalScore = scores[key].TotalScore,
+                            CurrentScore = inScore ? scores[key].CurrentScore : 0,
+                            TotalScore = inScore ? scores[key].TotalScore : 0,
                             IsAlive = participants[key].IsAlive,
                             IsRobot = participants[key].Team.IsRobot
                         });
